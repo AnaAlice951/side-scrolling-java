@@ -2,6 +2,7 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.mygdx.game.screens.MainMenuScreen;
 import com.mygdx.game.screens.PlayScreen;
 
 public class Castlevania extends Game {
@@ -10,7 +11,7 @@ public class Castlevania extends Game {
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		setScreen(new PlayScreen());
+		setScreen(new MainMenuScreen(batch, this));
 	}
 
 	@Override

@@ -15,7 +15,7 @@ public class GameInputProcessor implements InputProcessor {
 	public boolean keyDown(int keycode) {
 		
 		if(keycode == Input.Keys.LEFT) 
-			world.getCamera().setMovingLeft(true);
+			world.getCamera().setMovingLeft(true); // mexer o player ao inves da camera e atualizar a camera centralizando nele
 		
 		
 		if(keycode == Input.Keys.RIGHT) 
