@@ -10,8 +10,8 @@ public class Drop {
 	private String object;
 	private int x;
 	private int y;
-	private int width;
-	private int height;
+	private float width;
+	private float height;
 	private int assetOriginalWidth;
 	private int assetOriginalHeight;
 	private Texture dropTexture;
@@ -19,7 +19,7 @@ public class Drop {
 	private boolean dropped = false;
 	private boolean dropCollected = false;
 
-	private final int GAME_UNIT = 32;
+	private float GAME_UNIT = 32 * 0.8f;
 
 	public Drop(String object, int x, int y) {
 		this.object = object;
@@ -27,8 +27,8 @@ public class Drop {
 		this.y = y;
 		
 		if(this.object == "heart") {
-			width = 48;
-			height = 48;
+			width = 48 * 0.8f;
+			height = 48 * 0.8f;
 
 			assetOriginalWidth = 16;
 			assetOriginalHeight = 15;

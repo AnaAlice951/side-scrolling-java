@@ -1,5 +1,6 @@
 package com.mygdx.game.view.world;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
@@ -17,12 +18,12 @@ public class World {
 	
 	public World() {
 		camera = new Camera();
-		gameState = new State(1);
+		gameState = new State(2);
 	}
 	
 	public void loadMap(String tmxFile) {
 		tiledMap = new TmxMapLoader().load(tmxFile);
-		renderer = new OrthogonalTiledMapRenderer(tiledMap, 1280/720);
+		renderer = new OrthogonalTiledMapRenderer(tiledMap, 0.8f);
 	}
 	
 	public Cell getCellByCoordinate(int layer, int col, int row) {

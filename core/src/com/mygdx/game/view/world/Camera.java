@@ -8,9 +8,12 @@ public class Camera extends OrthographicCamera {
 	private boolean movingRight = false;
 	private boolean movingLeft = false;
 	
-	private int leftLimit;
-	private int rightLimit;
-	
+	private float leftLimit;
+	private float rightLimit;
+
+	private float GAME_UNIT = 32 * 0.8f;
+	private float TILES_PER_DEVICE_WIDTH = Gdx.graphics.getWidth() / (32 * 0.8f);
+
 	public Camera() {
 		setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 	}
@@ -24,27 +27,21 @@ public class Camera extends OrthographicCamera {
 		super.update();
 		
 		if(isMovingRight()) {
-			position.x += 200 * delta;
+			position.x += 500 * delta;
 		} else if(isMovingLeft()) {
-			position.x -= 200 * delta;
+			position.x -= 500 * delta;
 		}
 		
 		verifyOverflow(stage);
 	}
 	
 	public void verifyOverflow(int stage) {
-		if(stage == 1) {
-			leftLimit = 640;
-			rightLimit = 960;
-		} else if (stage == 2 || stage == 3) {
-			leftLimit = 2240;
-			rightLimit = 4160;
-		} else if(stage == 4) {
-			leftLimit = 5440;
-			rightLimit = 5760;
-		} else if(stage == 5) {
-			leftLimit = 7040;
-			rightLimit = 7360;
+		leftLimit = (Gdx.graphics.getWidth()/2) + (GAME_UNIT * 50 * (stage - 1));
+		rightLimit = leftLimit + (GAME_UNIT * (50 - TILES_PER_DEVICE_WIDTH));
+
+		if(stage == 2 || stage == 3 ) {
+			leftLimit = (Gdx.graphics.getWidth()/2) + (GAME_UNIT * 50);
+			rightLimit = leftLimit + (GAME_UNIT * (100 - TILES_PER_DEVICE_WIDTH));
 		}
 
 		if(position.x <= leftLimit)

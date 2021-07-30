@@ -15,14 +15,14 @@ public class BreakableObject {
 	private Drop drop;
 	private int x;
 	private int y;
-	private int width;
-	private int height;
+	private float width;
+	private float height;
 	private int assetOriginalWidth;
 	private int assetOriginalHeight;
 	private Rectangle bounds;
 	private boolean broken = false;
 
-	private final int GAME_UNIT = 32;
+	private float GAME_UNIT = 32 * 0.8f;
 
 	public BreakableObject(String object, int x, int y, Drop drop) {
 		this.object = object;
@@ -31,8 +31,8 @@ public class BreakableObject {
 		this.drop = drop;
 		
 		if(object == "firejar") {
-			width = 48;
-			height = 96;
+			width = 48 * 0.8f;
+			height = 96 * 0.8f;
 
 			assetOriginalWidth = 15;
 			assetOriginalHeight = 32;
@@ -42,8 +42,8 @@ public class BreakableObject {
 			for(int i = 0; i < 2; i++)
 				frames[i] = new Texture(Gdx.files.internal("items/firejar/firejar" + (i + 1) + ".png"));
 		} else if(object == "candle") {
-			width = 32;
-			height = 64;
+			width = 32 * 0.8f;
+			height = 64 * 0.8f;
 
 			assetOriginalWidth = 8;
 			assetOriginalHeight = 16;
