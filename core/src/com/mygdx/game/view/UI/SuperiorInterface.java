@@ -13,7 +13,7 @@ public class SuperiorInterface {
 	private Camera camera;
 	private Texture superiorBar = new Texture(Gdx.files.internal("superior.png"));
 	private Texture[] lifeBar = new Texture[10];
-	private TextComponent text = new TextComponent(30);
+	private TextComponent text = new TextComponent(25);
 
 	private int GAME_WIDTH = Gdx.graphics.getWidth();
 	private int GAME_HEIGHT = Gdx.graphics.getHeight();
