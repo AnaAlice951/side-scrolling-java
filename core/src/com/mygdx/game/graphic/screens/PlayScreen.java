@@ -1,19 +1,19 @@
-package com.mygdx.game.view.screens;
+package com.mygdx.game.graphic.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
-import com.mygdx.game.model.BreakableObject;
-import com.mygdx.game.model.MyGame;
-import com.mygdx.game.model.Player;
-import com.mygdx.game.model.Drop;
-import com.mygdx.game.controller.GameInputProcessor;
-import com.mygdx.game.view.UI.SuperiorInterface;
-import com.mygdx.game.view.world.World;
+import com.mygdx.game.models.BreakableObject;
+import com.mygdx.game.models.MyGame;
+import com.mygdx.game.models.Player;
+import com.mygdx.game.models.Drop;
+import com.mygdx.game.graphic.UI.SuperiorInterface;
+import com.mygdx.game.graphic.world.World;
 
 public class PlayScreen implements Screen {
 
@@ -54,7 +54,6 @@ public class PlayScreen implements Screen {
 		new BreakableObject("candle", 244, 2, new Drop("heart", 244, 1))
 	};
 
-	private GameInputProcessor inputProcessor;
 	private Player player;
 	private Music backgroundMusic;
 	private Music bossBattleMusic;
@@ -73,9 +72,6 @@ public class PlayScreen implements Screen {
 		player = new Player();
 		
 		topBar = new SuperiorInterface(world.getGameState(), world.getCamera());
-		
-		inputProcessor = new GameInputProcessor(world, player);
-		Gdx.input.setInputProcessor(inputProcessor);
 		
 		backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("audio/background.mp3"));
 		backgroundMusic.setLooping(true);
@@ -105,13 +101,40 @@ public class PlayScreen implements Screen {
 				    
 				    if(obj.getDrop().isDropped() && obj.getDrop().getBounds().contains(touchPoint.x, touchPoint.y))
 				    	obj.getDrop().collectDrop();
-				    
-				    
+
 				    if(obj.getBounds().contains(touchPoint.x, touchPoint.y))
 				    	obj.breakObject();
 			}
 		}
-		
+
+		if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+			if(!player.isAttacking()) {
+				world.getCamera().setMovingLeft(true);
+				player.setMovingLeft(true);
+			}
+		} else {
+			world.getCamera().setMovingLeft(false);
+			player.setMovingLeft(false);
+		}
+
+		if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+			if(!player.isAttacking()) {
+				world.getCamera().setMovingRight(true);
+				player.setMovingRight(true);
+			}
+		} else {
+			world.getCamera().setMovingRight(false);
+			player.setMovingRight(false);
+		}
+
+		if(Gdx.input.isKeyPressed(Input.Keys.X)) {
+			player.setAttacking(true);
+			world.getCamera().setMovingLeft(false);
+			world.getCamera().setMovingRight(false);
+			player.setMovingRight(false);
+			player.setMovingLeft(false);
+		}
+
 		world.render(delta);
 		batch.begin();
 		for(BreakableObject obj: breakableObjects) {

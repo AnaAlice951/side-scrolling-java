@@ -1,4 +1,4 @@
-package com.mygdx.game.model;
+package com.mygdx.game.models;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -12,13 +12,13 @@ public class Player {
     private Animation<Texture> walkAnimation;
     private Animation <Texture> attackAnimation;
     private Texture[] walkFrames = new Texture[5];
-    private Texture[] attackFrames = new Texture[5];
+    private Texture[] attackFrames = new Texture[3];
     private boolean flipped = false, attacking = false;
     private Rectangle walkHitbox, attackHitbox;
     private float GAME_UNIT = 32 * 0.8f;
     private float stateTime = 0f;
     private int walkFramesOriginalWidth, walkFramesOriginalHeight, attackFramesOriginalWidth, attackFramesOriginalHeight;
-    
+
     //Player movimentação
     private boolean movingRight = false;
     private boolean movingLeft = false;
@@ -40,81 +40,85 @@ public class Player {
     
         for(int i = 0; i < 3; i++)
         	attackFrames[i] = new Texture(Gdx.files.internal("player/attack"+ (i + 1) + ".png"));
-        attackAnimation = new Animation<Texture>(1f, attackFrames);
+        attackAnimation = new Animation<Texture>(0.1f, attackFrames);
     }
     
 	public void draw(SpriteBatch batch) {
 		stateTime += Gdx.graphics.getDeltaTime();
 		
+		if(!attacking && (movingLeft || movingRight)) {
+			Texture currentFrameWalking = walkAnimation.getKeyFrame(stateTime, true);
 
-		Texture currentFrameWalking = walkAnimation.getKeyFrame(stateTime, true);
-		Texture currentFrameAttacking = attackAnimation.getKeyFrame(stateTime, false);
-		
-		if(movingLeft || movingRight) {
 			batch.draw(
 		        currentFrameWalking,
 		        walkHitbox.x,walkHitbox.y,
-		        77, 96,
+		        100, 96,
 		        0, 0,
 		        walkFramesOriginalWidth, walkFramesOriginalHeight,
 		        flipped, false
 			);
 		} else if (attacking) {
+			Texture currentFrameAttacking = attackAnimation.getKeyFrame(stateTime, false);
+
 			if(!attackAnimation.isAnimationFinished(stateTime)) {
-				switch(attackAnimation.getKeyFrameIndex(stateTime)) {
-					case 0:
-						attackFramesOriginalWidth = 34;
-						attackFramesOriginalHeight = 32;
-						break;
-					case 1: 
-						attackFramesOriginalWidth = 34;
-						attackFramesOriginalHeight = 32;
-						break;
-					case 2: 
-						attackFramesOriginalWidth = 62;
-						attackFramesOriginalHeight = 32;
-						break;	
-				}
-				if(currentFrameAttacking == null)
-					System.out.println("cu");
-					
-				if(currentFrameAttacking != null) {
+				if(attackAnimation.getKeyFrameIndex(stateTime) == 0 || attackAnimation.getKeyFrameIndex(stateTime) == 1) {
 					batch.draw(
 						currentFrameAttacking,
 						attackHitbox.x, attackHitbox.y,
-				        150, 96,
-				        0, 0,
-				        attackFramesOriginalWidth, attackFramesOriginalHeight,
-				        flipped, false
+						100, 96,
+						0, 0,
+						34, 32,
+						!flipped, false
 					);
+				} else {
+					if(flipped) {
+						batch.draw(
+							currentFrameAttacking,
+							attackHitbox.x - 100, attackHitbox.y,
+							200, 96,
+							0, 0,
+							62, 32,
+							!flipped, false
+						);
+					} else {
+						batch.draw(
+							currentFrameAttacking,
+							attackHitbox.x, attackHitbox.y,
+							200, 96,
+							0, 0,
+							62, 32,
+							!flipped, false
+						);
+					}
 				}
-			} else 
-				attacking = false;
+			} else {
+				setAttacking(false);
+			}
 		} else {
 			batch.draw(
 				walkFrames[0],
-				walkHitbox.x,walkHitbox.y,
-		        77, 96,
-		        0, 0,
-		        walkFramesOriginalWidth, walkFramesOriginalHeight,
-		        flipped, false
+				walkHitbox.x, walkHitbox.y,
+				100, 96,
+				0, 0,
+				walkFramesOriginalWidth, walkFramesOriginalHeight,
+				flipped, false
 			);
 		}
 	}
 	
 	public void move(float delta, int stage) {
 		if(isMovingRight()) {
-				walkHitbox.x += 300 * delta;
-				attackHitbox.x += 300 * delta;
-				flipped = false;
-			} else if(isMovingLeft()) {
-				walkHitbox.x -= 300 * delta;
-				attackHitbox.x -= 300 * delta;
-				flipped = true;
-			}
+			walkHitbox.x += 300 * delta;
+			attackHitbox.x += 300 * delta;
+			flipped = false;
+		} else if(isMovingLeft()) {
+			walkHitbox.x -= 300 * delta;
+			attackHitbox.x -= 300 * delta;
+			flipped = true;
+		}
 		
 			//verifyOverflow(stage);
-		}
+    }
 	
     public boolean isMovingRight() {
 		return movingRight;
@@ -144,10 +148,7 @@ public class Player {
 	}
 
 	public void setAttacking(boolean attacking) {
+    	stateTime = 0;
 		this.attacking = attacking;
-        attackAnimation = new Animation<Texture>(1f, attackFrames);
-
 	}
-
-	
 }

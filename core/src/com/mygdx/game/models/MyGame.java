@@ -1,8 +1,8 @@
-package com.mygdx.game.model;
+package com.mygdx.game.models;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.mygdx.game.view.screens.MainMenuScreen;
+import com.mygdx.game.graphic.screens.MainMenuScreen;
 
 public class MyGame extends Game {
 	SpriteBatch batch;

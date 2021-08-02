@@ -1,4 +1,4 @@
-package com.mygdx.game.model;
+package com.mygdx.game.models;
 
 public class State {
 	private int stage;

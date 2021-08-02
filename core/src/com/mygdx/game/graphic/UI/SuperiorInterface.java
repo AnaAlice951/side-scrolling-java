@@ -1,12 +1,12 @@
-package com.mygdx.game.view.UI;
+package com.mygdx.game.graphic.UI;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.mygdx.game.view.world.Camera;
-import com.mygdx.game.model.State;
+import com.mygdx.game.graphic.world.Camera;
+import com.mygdx.game.models.State;
 
 public class SuperiorInterface {
 	private State state;

@@ -1,4 +1,4 @@
-package com.mygdx.game.view.world;
+package com.mygdx.game.graphic.world;
 
 import java.util.HashMap;
 
