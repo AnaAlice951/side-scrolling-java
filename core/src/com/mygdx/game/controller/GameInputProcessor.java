@@ -2,25 +2,41 @@ package com.mygdx.game.controller;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
+import com.mygdx.game.model.Player;
+import com.mygdx.game.view.world.Camera;
 import com.mygdx.game.view.world.World;
 
 public class GameInputProcessor implements InputProcessor {
 	
 	World world;
+	Player player;
 	
-	public GameInputProcessor(World world) {
+	public GameInputProcessor(World world, Player player) {
 		this.world = world;
+		this.player = player;
 	}
+	
 	
 	@Override
 	public boolean keyDown(int keycode) {
 		
-		if(keycode == Input.Keys.LEFT) 
+		if(keycode == Input.Keys.LEFT) {
 			world.getCamera().setMovingLeft(true);
+			player.setMovingLeft(true);
+		}
 		
-		
-		if(keycode == Input.Keys.RIGHT) 
+		if(keycode == Input.Keys.RIGHT) { 
 			world.getCamera().setMovingRight(true);
+			player.setMovingRight(true);
+		}
+		
+		if (keycode == Input.Keys.X) {
+			player.setAttacking(true);
+			player.setMovingRight(false);
+			player.setMovingLeft(false);
+		}
+		
+		
 		
 		return false;
 	}
@@ -28,11 +44,16 @@ public class GameInputProcessor implements InputProcessor {
 	@Override
 	public boolean keyUp(int keycode) {
 
-		if(keycode == Input.Keys.LEFT)
+		if(keycode == Input.Keys.LEFT) {
 			world.getCamera().setMovingLeft(false);
+			player.setMovingLeft(false);
+		}
 		
-		if(keycode == Input.Keys.RIGHT) 
+		if(keycode == Input.Keys.RIGHT) {
 			world.getCamera().setMovingRight(false);
+			player.setMovingRight(false);	
+		}
+		
 		
 		return false;
 	}

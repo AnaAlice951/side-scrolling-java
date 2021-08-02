@@ -10,15 +10,15 @@ com/mygdx/game/model/MyGame.java
  com.mygdx.game.model.MyGame
 com/mygdx/game/view/world/World.java
  com.mygdx.game.view.world.World
-com/mygdx/game/model/BreakableObject.java
- com.mygdx.game.model.BreakableObject
+com/mygdx/game/view/UI/SuperiorInterface.java
+ com.mygdx.game.view.UI.SuperiorInterface
 com/mygdx/game/model/Drop.java
  com.mygdx.game.model.Drop
 com/mygdx/game/model/State.java
  com.mygdx.game.model.State
 com/mygdx/game/view/UI/TextComponent.java
  com.mygdx.game.view.UI.TextComponent
-com/mygdx/game/view/UI/SuperiorInterface.java
- com.mygdx.game.view.UI.SuperiorInterface
+com/mygdx/game/model/BreakableObject.java
+ com.mygdx.game.model.BreakableObject
 com/mygdx/game/view/screens/PlayScreen.java
  com.mygdx.game.view.screens.PlayScreen

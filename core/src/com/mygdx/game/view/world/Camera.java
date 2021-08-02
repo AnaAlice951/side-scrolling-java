@@ -27,9 +27,9 @@ public class Camera extends OrthographicCamera {
 		super.update();
 		
 		if(isMovingRight()) {
-			position.x += 500 * delta;
+			position.x += 300 * delta;
 		} else if(isMovingLeft()) {
-			position.x -= 500 * delta;
+			position.x -= 300 * delta;
 		}
 		
 		verifyOverflow(stage);

@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.model.BreakableObject;
 import com.mygdx.game.model.MyGame;
+import com.mygdx.game.model.Player;
 import com.mygdx.game.model.Drop;
 import com.mygdx.game.controller.GameInputProcessor;
 import com.mygdx.game.view.UI.SuperiorInterface;
@@ -54,7 +55,7 @@ public class PlayScreen implements Screen {
 	};
 
 	private GameInputProcessor inputProcessor;
-	
+	private Player player;
 	private Music backgroundMusic;
 	private Music bossBattleMusic;
 	private Sound gameOverSound;
@@ -69,10 +70,11 @@ public class PlayScreen implements Screen {
 	public void show() {
 		world = new World();
 		world.loadMap("levelmap.tmx");
+		player = new Player();
 		
 		topBar = new SuperiorInterface(world.getGameState(), world.getCamera());
 		
-		inputProcessor = new GameInputProcessor(world);
+		inputProcessor = new GameInputProcessor(world, player);
 		Gdx.input.setInputProcessor(inputProcessor);
 		
 		backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("audio/background.mp3"));
@@ -116,6 +118,8 @@ public class PlayScreen implements Screen {
 			obj.draw(batch);
 		}
 		topBar.draw(batch);
+		player.move(delta, world.getGameState().getStage());
+		player.draw(batch);
 		batch.end();
 	}
 

@@ -16,9 +16,10 @@ public class World {
 	private Camera camera;
 	private State gameState;
 	
+	
 	public World() {
 		camera = new Camera();
-		gameState = new State(2);
+		gameState = new State(1);
 	}
 	
 	public void loadMap(String tmxFile) {
