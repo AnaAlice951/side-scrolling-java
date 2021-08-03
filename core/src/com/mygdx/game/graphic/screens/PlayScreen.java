@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.mygdx.game.models.BreakableObject;
 import com.mygdx.game.models.MyGame;
 import com.mygdx.game.models.Player;
+import com.mygdx.game.models.State;
 import com.mygdx.game.models.Drop;
 import com.mygdx.game.graphic.UI.SuperiorInterface;
 import com.mygdx.game.graphic.world.World;
@@ -20,6 +21,7 @@ public class PlayScreen implements Screen {
 	private SpriteBatch batch;
 	private World world;
 	private SuperiorInterface topBar;
+	private State state;
 	
 	private BreakableObject[] breakableObjects = {
 		new BreakableObject("firejar", 10, 1, new Drop("heart", 10, 1)),
@@ -67,8 +69,9 @@ public class PlayScreen implements Screen {
 	
 	@Override
 	public void show() {
-		player = new Player();
-		world = new World(player);
+		state = new State(2);
+		player = new Player(state);
+		world = new World(player, state);
 		world.loadMap("levelmap.tmx");
 		
 		topBar = new SuperiorInterface(world.getGameState(), world.getCamera());
@@ -134,10 +137,15 @@ public class PlayScreen implements Screen {
 			player.setMovingRight(false);
 			player.setMovingLeft(false);
 		}
-
+		
 		world.render(delta);
 		batch.begin();
 		for(BreakableObject obj: breakableObjects) {
+			if (player.getAttackHitbox().overlaps(obj.getBounds())) {
+				obj.breakObject();
+			}
+			if (player.getPlayerHitbox().overlaps(obj.getDrop().getBounds()))
+				obj.getDrop().collectDrop();
 			obj.draw(batch);
 		}
 		topBar.draw(batch);

@@ -17,9 +17,9 @@ public class World {
 	private State gameState;
 	private Player player;
 	
-	public World(Player player) {
+	public World(Player player, State state) {
 		camera = new Camera();
-		gameState = new State(1);
+		gameState = state;
 		this.player = player;
 	}
 	

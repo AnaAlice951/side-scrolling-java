@@ -27,11 +27,8 @@ public class Camera extends OrthographicCamera {
 	public void updateCamera(float delta, int stage, Player player) {
 		super.update();
 
-		if(isMovingRight()) {
-			position.x += 300 * delta;
-		} else if(isMovingLeft()) {
-			position.x -= 300 * delta;
-		}
+		position.x = player.getPlayerHitbox().x;
+		
 		
 		verifyOverflow(stage);
 	}
