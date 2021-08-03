@@ -67,9 +67,9 @@ public class PlayScreen implements Screen {
 	
 	@Override
 	public void show() {
-		world = new World();
-		world.loadMap("levelmap.tmx");
 		player = new Player();
+		world = new World(player);
+		world.loadMap("levelmap.tmx");
 		
 		topBar = new SuperiorInterface(world.getGameState(), world.getCamera());
 		
@@ -174,5 +174,6 @@ public class PlayScreen implements Screen {
 		for(BreakableObject obj: breakableObjects) {
 			obj.dispose();
 		}
+		player.dispose();
 	}
 }

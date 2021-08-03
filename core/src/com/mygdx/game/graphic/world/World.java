@@ -6,6 +6,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.mygdx.game.models.Player;
 import com.mygdx.game.models.State;
 
 public class World {
@@ -14,11 +15,12 @@ public class World {
 	private OrthogonalTiledMapRenderer renderer;
 	private Camera camera;
 	private State gameState;
+	private Player player;
 	
-	
-	public World() {
+	public World(Player player) {
 		camera = new Camera();
 		gameState = new State(1);
+		this.player = player;
 	}
 	
 	public void loadMap(String tmxFile) {
@@ -47,7 +49,7 @@ public class World {
 	}
 	
 	public void render(float delta) {
-		camera.updateCamera(delta, gameState.getStage());
+		camera.updateCamera(delta, gameState.getStage(), player);
 		renderer.setView(camera);
 		renderer.render();
 	}

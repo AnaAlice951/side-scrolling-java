@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 
 public class Player {
@@ -13,25 +14,26 @@ public class Player {
     private Animation <Texture> attackAnimation;
     private Texture[] walkFrames = new Texture[5];
     private Texture[] attackFrames = new Texture[3];
-    private boolean flipped = false, attacking = false;
-    private Rectangle walkHitbox, attackHitbox;
-    private float GAME_UNIT = 32 * 0.8f;
-    private float stateTime = 0f;
-    private int walkFramesOriginalWidth, walkFramesOriginalHeight, attackFramesOriginalWidth, attackFramesOriginalHeight;
+	private boolean flipped = false;
+	private float stateTime = 0f;
 
-    //Player movimentação
+	private float GAME_UNIT = 32 * 0.8f;
+    private int PLAYER_WIDTH = 100;
+    private int PLAYER_HEIGHT = 96;
+    private int WHIP_WIDTH = 150 - PLAYER_WIDTH;
+    private int WHIP_HEIGHT = 32;
+	private Rectangle playerHitbox, attackHitbox;
+
+    private boolean attacking = false;
     private boolean movingRight = false;
     private boolean movingLeft = false;
+
+    private ShapeRenderer sr = new ShapeRenderer();
 
     public Player(){
 
         //Propriedades do player
-        walkFramesOriginalWidth = 40;
-        walkFramesOriginalHeight = 32;
-        attackHitbox = new Rectangle(GAME_UNIT * 0, GAME_UNIT * 1, 150, 96);
-        walkHitbox = new Rectangle(GAME_UNIT * 0, GAME_UNIT * 1, 77, 96);
-
-
+        playerHitbox = new Rectangle(GAME_UNIT * 1, GAME_UNIT * 1, PLAYER_WIDTH, PLAYER_HEIGHT);
 
         //Animação
         for(int i = 0; i < 5; i++)
@@ -45,16 +47,16 @@ public class Player {
     
 	public void draw(SpriteBatch batch) {
 		stateTime += Gdx.graphics.getDeltaTime();
-		
+
 		if(!attacking && (movingLeft || movingRight)) {
 			Texture currentFrameWalking = walkAnimation.getKeyFrame(stateTime, true);
 
 			batch.draw(
 		        currentFrameWalking,
-		        walkHitbox.x,walkHitbox.y,
-		        100, 96,
+		        playerHitbox.x,playerHitbox.y,
+		        PLAYER_WIDTH, PLAYER_HEIGHT,
 		        0, 0,
-		        walkFramesOriginalWidth, walkFramesOriginalHeight,
+		        currentFrameWalking.getWidth(), currentFrameWalking.getHeight(),
 		        flipped, false
 			);
 		} else if (attacking) {
@@ -64,29 +66,29 @@ public class Player {
 				if(attackAnimation.getKeyFrameIndex(stateTime) == 0 || attackAnimation.getKeyFrameIndex(stateTime) == 1) {
 					batch.draw(
 						currentFrameAttacking,
-						attackHitbox.x, attackHitbox.y,
-						100, 96,
+						playerHitbox.x, playerHitbox.y,
+						PLAYER_WIDTH, PLAYER_HEIGHT,
 						0, 0,
-						34, 32,
+						currentFrameAttacking.getWidth(), currentFrameAttacking.getHeight(),
 						!flipped, false
 					);
 				} else {
 					if(flipped) {
 						batch.draw(
 							currentFrameAttacking,
-							attackHitbox.x - 100, attackHitbox.y,
-							200, 96,
+							playerHitbox.x - 100, playerHitbox.y,
+							PLAYER_WIDTH * 2, PLAYER_HEIGHT,
 							0, 0,
-							62, 32,
+							currentFrameAttacking.getWidth(), currentFrameAttacking.getHeight(),
 							!flipped, false
 						);
 					} else {
 						batch.draw(
 							currentFrameAttacking,
-							attackHitbox.x, attackHitbox.y,
-							200, 96,
+							playerHitbox.x, playerHitbox.y,
+							PLAYER_WIDTH * 2, PLAYER_HEIGHT,
 							0, 0,
-							62, 32,
+							currentFrameAttacking.getWidth(), currentFrameAttacking.getHeight(),
 							!flipped, false
 						);
 					}
@@ -97,29 +99,41 @@ public class Player {
 		} else {
 			batch.draw(
 				walkFrames[0],
-				walkHitbox.x, walkHitbox.y,
-				100, 96,
+				playerHitbox.x, playerHitbox.y,
+				PLAYER_WIDTH, PLAYER_HEIGHT,
 				0, 0,
-				walkFramesOriginalWidth, walkFramesOriginalHeight,
+				walkFrames[0].getWidth(), walkFrames[0].getHeight(),
 				flipped, false
 			);
 		}
+		//sr.begin(ShapeRenderer.ShapeType.Line);
+		//sr.rect(playerHitbox.x, playerHitbox.y, playerHitbox.width, playerHitbox.height);
+		//sr.end();
 	}
 	
 	public void move(float delta, int stage) {
 		if(isMovingRight()) {
-			walkHitbox.x += 300 * delta;
-			attackHitbox.x += 300 * delta;
+			playerHitbox.x += 300 * delta;
 			flipped = false;
 		} else if(isMovingLeft()) {
-			walkHitbox.x -= 300 * delta;
-			attackHitbox.x -= 300 * delta;
+			playerHitbox.x -= 300 * delta;
 			flipped = true;
 		}
-		
-			//verifyOverflow(stage);
+
+		//verifyOverflow();
     }
-	
+
+    public void verifyOverflow() {
+		float leftLimit = 0;
+		float rightLimit = Gdx.graphics.getWidth() - PLAYER_WIDTH;
+
+		if(playerHitbox.x <= leftLimit)
+			playerHitbox.x = leftLimit;
+
+		if(playerHitbox.x >= rightLimit)
+			playerHitbox.x = rightLimit;
+	}
+
     public boolean isMovingRight() {
 		return movingRight;
 	}
@@ -141,6 +155,8 @@ public class Player {
             frame.dispose();
         for(Texture frame: attackFrames)
             frame.dispose();
+
+        sr.dispose();
     }
 
 	public boolean isAttacking() {
@@ -150,5 +166,13 @@ public class Player {
 	public void setAttacking(boolean attacking) {
     	stateTime = 0;
 		this.attacking = attacking;
+	}
+
+	public Rectangle getPlayerHitbox() {
+		return playerHitbox;
+	}
+
+	public void setPlayerHitbox(Rectangle playerHitbox) {
+		this.playerHitbox = playerHitbox;
 	}
 }

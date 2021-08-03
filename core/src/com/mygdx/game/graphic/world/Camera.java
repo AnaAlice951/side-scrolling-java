@@ -2,6 +2,7 @@ package com.mygdx.game.graphic.world;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.mygdx.game.models.Player;
 
 public class Camera extends OrthographicCamera {
 	
@@ -23,9 +24,9 @@ public class Camera extends OrthographicCamera {
 		viewportHeight = vh;
 	}
 	
-	public void updateCamera(float delta, int stage) {
+	public void updateCamera(float delta, int stage, Player player) {
 		super.update();
-		
+
 		if(isMovingRight()) {
 			position.x += 300 * delta;
 		} else if(isMovingLeft()) {
