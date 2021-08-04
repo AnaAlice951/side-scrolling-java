@@ -7,7 +7,11 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
+import com.mygdx.game.graphic.world.TileType;
 import com.mygdx.game.models.BreakableObject;
 import com.mygdx.game.models.MyGame;
 import com.mygdx.game.models.Player;
@@ -61,15 +65,14 @@ public class PlayScreen implements Screen {
 	private Music bossBattleMusic;
 	private Sound gameOverSound;
 	private Sound allClearSound;
-	
+
 	public PlayScreen(SpriteBatch batch, MyGame game) {
 		this.batch = batch;
 	}
-	
-	
+
 	@Override
 	public void show() {
-		state = new State(2);
+		state = new State(5);
 		player = new Player(state);
 		world = new World(player, state);
 		world.loadMap("levelmap.tmx");
@@ -95,18 +98,65 @@ public class PlayScreen implements Screen {
 		
 		batch.setProjectionMatrix(world.getCamera().combined);
 
-		// substituir clique por colisão no momento de quebrar os objetos
+		handleInput();
+
+		world.render(delta);
+
+		batch.begin();
+		for(BreakableObject obj: breakableObjects) {
+			if (player.getAttackHitbox().overlaps(obj.getBounds())) {
+				obj.breakObject();
+			}
+
+			if (player.getPlayerHitbox().overlaps(obj.getDrop().getBounds()) && obj.getDrop().isDropped()) {
+				obj.getDrop().collectDrop();
+			}
+
+			obj.draw(batch);
+		}
+		topBar.draw(batch);
+		applyGravityAndCollisions(delta);
+		player.move(delta);
+		player.draw(batch);
+		batch.end();
+
+		System.out.println(player.getX());
+		System.out.println(player.getY());
+	}
+
+	private void applyGravityAndCollisions(float delta) {
+		TileType tile = world.getTileTypeByCoordinate(1, (int) (player.getX()/(32*0.8f)), (int) (player.getY()/(32*0.8f)));
+
+		if(tile != null) {
+			String tileId = tile.toString();
+			if(tileId != "GROUND" && tileId != "STAIR") {
+				player.setY(player.getY() - 500 * delta);
+			} else if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+				player.setJumping(true);
+			}
+		} else {
+			player.setY(player.getY() - 500 * delta);
+		}
+
+		tile = world.getTileTypeByCoordinate(1, (int) ((player.getX()/(32*0.8f)) + (2*0.8f)), (int) ((player.getY()/(32*0.8f)) + (2*0.8f)));
+		if(tile != null) {
+			String tileId = tile.toString();
+			if(tileId == "GROUND" || tileId == "LITTLE_BRICK") {
+				player.setX(player.getX() - 300 * delta);
+			}
+		}
+
+	}
+
+	private void handleInput() {
 		if(Gdx.input.justTouched()) {
 			Vector3 touchPoint = new Vector3();
-			
-			for(BreakableObject obj: breakableObjects) {
-				    world.getCamera().unproject(touchPoint.set(Gdx.input.getX(), Gdx.input.getY(), 0));
-				    
-				    if(obj.getDrop().isDropped() && obj.getDrop().getBounds().contains(touchPoint.x, touchPoint.y))
-				    	obj.getDrop().collectDrop();
 
-				    if(obj.getBounds().contains(touchPoint.x, touchPoint.y))
-				    	obj.breakObject();
+			for(BreakableObject obj: breakableObjects) {
+				world.getCamera().unproject(touchPoint.set(Gdx.input.getX(), Gdx.input.getY(), 0));
+
+				player.setX(touchPoint.x);
+				player.setY(touchPoint.y);
 			}
 		}
 
@@ -137,21 +187,6 @@ public class PlayScreen implements Screen {
 			player.setMovingRight(false);
 			player.setMovingLeft(false);
 		}
-		
-		world.render(delta);
-		batch.begin();
-		for(BreakableObject obj: breakableObjects) {
-			if (player.getAttackHitbox().overlaps(obj.getBounds())) {
-				obj.breakObject();
-			}
-			if (player.getPlayerHitbox().overlaps(obj.getDrop().getBounds()))
-				obj.getDrop().collectDrop();
-			obj.draw(batch);
-		}
-		topBar.draw(batch);
-		player.move(delta, world.getGameState().getStage());
-		player.draw(batch);
-		batch.end();
 	}
 
 	@Override

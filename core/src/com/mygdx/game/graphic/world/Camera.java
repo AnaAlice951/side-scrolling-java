@@ -26,10 +26,7 @@ public class Camera extends OrthographicCamera {
 	
 	public void updateCamera(float delta, int stage, Player player) {
 		super.update();
-
-		position.x = player.getPlayerHitbox().x;
-		
-		
+		position.x = player.getX();
 		verifyOverflow(stage);
 	}
 	

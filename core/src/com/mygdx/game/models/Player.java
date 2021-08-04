@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 
 public class Player {
@@ -19,26 +18,27 @@ public class Player {
 	
 
 	private float GAME_UNIT = 32 * 0.8f;
-    private int PLAYER_WIDTH = 32;
-    private int PLAYER_HEIGHT = 96;
-    private int WHIP_WIDTH = 150 - PLAYER_WIDTH;
-    private int WHIP_HEIGHT = 32;
+    public int PLAYER_WIDTH = 32;
+    public int PLAYER_HEIGHT = 96;
 	private Rectangle playerHitbox, attackHitbox;
 
+	private float x, y;
     private boolean attacking = false;
     private boolean movingRight = false;
     private boolean movingLeft = false;
+    private boolean jumping = false;
+    private float jumpingInitialPosition;
     private State gameState;
-
-    private ShapeRenderer sr = new ShapeRenderer();
 
     public Player(State state){
     	gameState = state;
         //Propriedades do player
-        playerHitbox = new Rectangle(GAME_UNIT, GAME_UNIT, PLAYER_WIDTH, PLAYER_HEIGHT);
+        playerHitbox = new Rectangle(GAME_UNIT, 332, PLAYER_WIDTH, PLAYER_HEIGHT);
+        x = GAME_UNIT;
+        y = 332;
+
         attackHitbox = new Rectangle(0, 0, 0, 0);
         
-
         //Animação
         for(int i = 0; i < 5; i++)
             walkFrames[i] = new Texture(Gdx.files.internal("player/walk"+ (i + 1) + ".png"));
@@ -58,7 +58,7 @@ public class Player {
 
 			batch.draw(
 		        currentFrameWalking,
-		        playerHitbox.x,playerHitbox.y,
+		        x,y,
 		        64, PLAYER_HEIGHT,
 		        0, 0,
 		        currentFrameWalking.getWidth(), currentFrameWalking.getHeight(),
@@ -71,7 +71,7 @@ public class Player {
 				if(attackAnimation.getKeyFrameIndex(stateTime) == 0 || attackAnimation.getKeyFrameIndex(stateTime) == 1) {
 					batch.draw(
 						currentFrameAttacking,
-						playerHitbox.x, playerHitbox.y,
+						x, y,
 						64, PLAYER_HEIGHT,
 						0, 0,
 						currentFrameAttacking.getWidth(), currentFrameAttacking.getHeight(),
@@ -79,21 +79,20 @@ public class Player {
 					);
 				} else {
 					if(flipped) {
-						//playerHitbox = new Rectangle(playerHitbox.x+32, playerHitbox.y, PLAYER_WIDTH, PLAYER_HEIGHT);
-				        attackHitbox = new Rectangle(playerHitbox.x - 64, playerHitbox.y + 32, 64, 32);
+						attackHitbox = new Rectangle(x - 64, y + 32, 64, 32);
 						batch.draw(
 							currentFrameAttacking,
-							playerHitbox.x - 64, playerHitbox.y,
+							x - 64, y,
 							64 * 2, PLAYER_HEIGHT,
 							0, 0,
 							currentFrameAttacking.getWidth(), currentFrameAttacking.getHeight(),
 							!flipped, false
 						);
 					} else {
-				        attackHitbox = new Rectangle(playerHitbox.x + 64, playerHitbox.y + 32, 64, 32);
+				        attackHitbox = new Rectangle(x + 64, y + 32, 64, 12);
 						batch.draw(
 							currentFrameAttacking,
-							playerHitbox.x, playerHitbox.y,
+							x, y,
 							64 * 2, PLAYER_HEIGHT,
 							0, 0,
 							currentFrameAttacking.getWidth(), currentFrameAttacking.getHeight(),
@@ -108,28 +107,34 @@ public class Player {
 		} else {
 			batch.draw(
 				walkFrames[0],
-				playerHitbox.x, playerHitbox.y,
+				x, y,
 				64, PLAYER_HEIGHT,
 				0, 0,
 				walkFrames[0].getWidth(), walkFrames[0].getHeight(),
 				flipped, false
 			);
 		}
-		//sr.begin(ShapeRenderer.ShapeType.Filled);
-		//sr.rect(attackHitbox.x, attackHitbox.y, attackHitbox.width, attackHitbox.height);
-		//sr.end();
 	}
 	
-	public void move(float delta, int stage) {
+	public void move(float delta) {
 		if(isMovingRight()) {
-			playerHitbox.x += 300 * delta;
+			x += 300 * delta;
 			flipped = false;
 		} else if(isMovingLeft()) {
-			playerHitbox.x -= 300 * delta;
+			x -= 300 * delta;
 			flipped = true;
 		}
 
 		verifyOverflow(gameState.getStage());
+
+		if(isJumping())
+			y += 1000 * delta;
+
+		if(y >= jumpingInitialPosition + 120)
+			setJumping(false);
+
+		playerHitbox.x = x;
+		playerHitbox.y = y;
     }
 
     public void verifyOverflow(int stage) {
@@ -141,10 +146,11 @@ public class Player {
 			rightLimit = leftLimit + (GAME_UNIT * 100 - (PLAYER_WIDTH - 10));
 		}
 
-		if(playerHitbox.x <= leftLimit)
-			playerHitbox.x = leftLimit;
-		if(playerHitbox.x >= rightLimit)
-			playerHitbox.x = rightLimit;
+		if(x <= leftLimit)
+			x = leftLimit;
+
+		if(x >= rightLimit)
+			x = rightLimit;
 	}
 
     public boolean isMovingRight() {
@@ -168,8 +174,6 @@ public class Player {
             frame.dispose();
         for(Texture frame: attackFrames)
             frame.dispose();
-
-        sr.dispose();
     }
 
 	public boolean isAttacking() {
@@ -185,15 +189,34 @@ public class Player {
 		return playerHitbox;
 	}
 
-	public void setPlayerHitbox(Rectangle playerHitbox) {
-		this.playerHitbox = playerHitbox;
-	}
-
 	public Rectangle getAttackHitbox() {
 		return attackHitbox;
 	}
 
-	public void setAttackHitbox(Rectangle attackHitbox) {
-		this.attackHitbox = attackHitbox;
+	public float getX() {
+		return x;
+	}
+
+	public void setX(float x) {
+		this.x = x;
+	}
+
+	public float getY() {
+		return y;
+	}
+
+	public void setY(float y) {
+		this.y = y;
+	}
+
+	public boolean isJumping() {
+		return jumping;
+	}
+
+	public void setJumping(boolean jumping) {
+		this.jumping = jumping;
+
+		if(jumping)
+			jumpingInitialPosition = y;
 	}
 }

@@ -1,15 +1,17 @@
-com/mygdx/game/models/MyGame.java
- com.mygdx.game.models.MyGame
 com/mygdx/game/models/State.java
  com.mygdx.game.models.State
-com/mygdx/game/models/Drop.java
- com.mygdx.game.models.Drop
 com/mygdx/game/models/BreakableObject.java
  com.mygdx.game.models.BreakableObject
-com/mygdx/game/graphic/UI/TextComponent.java
- com.mygdx.game.graphic.UI.TextComponent
 com/mygdx/game/graphic/world/TileType.java
  com.mygdx.game.graphic.world.TileType
+com/mygdx/game/graphic/UI/TextComponent.java
+ com.mygdx.game.graphic.UI.TextComponent
+com/mygdx/game/models/Enemy.java
+ com.mygdx.game.models.Enemy
+com/mygdx/game/models/MyGame.java
+ com.mygdx.game.models.MyGame
+com/mygdx/game/models/Drop.java
+ com.mygdx.game.models.Drop
 com/mygdx/game/graphic/screens/MainMenuScreen.java
  com.mygdx.game.graphic.screens.MainMenuScreen
 com/mygdx/game/graphic/screens/PlayScreen.java

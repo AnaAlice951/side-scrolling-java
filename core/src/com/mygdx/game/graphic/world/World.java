@@ -28,11 +28,6 @@ public class World {
 		renderer = new OrthogonalTiledMapRenderer(tiledMap, 0.8f);
 	}
 	
-	public Cell getCellByCoordinate(int layer, int col, int row) {
-		Cell cell = ((TiledMapTileLayer) tiledMap.getLayers().get(layer)).getCell(col, row);
-		return cell;
-	}
-	
 	public TileType getTileTypeByCoordinate(int layer, int col, int row) {
 		Cell cell = ((TiledMapTileLayer) tiledMap.getLayers().get(layer)).getCell(col, row);
 
