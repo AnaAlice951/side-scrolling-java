@@ -1,5 +1,7 @@
 package com.mygdx.game.graphic.screens;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -11,12 +13,15 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.mygdx.game.graphic.world.TileType;
 import com.mygdx.game.models.BreakableObject;
 import com.mygdx.game.models.MyGame;
 import com.mygdx.game.models.Player;
 import com.mygdx.game.models.State;
+import com.mygdx.game.models.Zombie;
 import com.mygdx.game.models.Drop;
+import com.mygdx.game.models.LittleBat;
 import com.mygdx.game.graphic.UI.SuperiorInterface;
 import com.mygdx.game.graphic.world.World;
 
@@ -61,10 +66,13 @@ public class PlayScreen implements Screen {
 	};
 
 	private Player player;
+	private ArrayList <Zombie> zombies = new ArrayList<Zombie>();
+	private ArrayList <LittleBat> littleBats = new ArrayList<LittleBat>();
 	private Music backgroundMusic;
 	private Music bossBattleMusic;
 	private Sound gameOverSound;
 	private Sound allClearSound;
+	private long lastPlayerDamage;
 
 	public PlayScreen(SpriteBatch batch, MyGame game) {
 		this.batch = batch;
@@ -72,10 +80,13 @@ public class PlayScreen implements Screen {
 
 	@Override
 	public void show() {
-		state = new State(5);
+		state = new State(2);
 		player = new Player(state);
 		world = new World(player, state);
 		world.loadMap("levelmap.tmx");
+		
+		zombies.add(new Zombie(state.getStage()));
+		littleBats.add(new LittleBat(state.getStage()));
 		
 		topBar = new SuperiorInterface(world.getGameState(), world.getCamera());
 		
@@ -110,18 +121,56 @@ public class PlayScreen implements Screen {
 
 			if (player.getPlayerHitbox().overlaps(obj.getDrop().getBounds()) && obj.getDrop().isDropped()) {
 				obj.getDrop().collectDrop();
+				state.heartsCollected++;
 			}
-
+			
 			obj.draw(batch);
 		}
+		
+		for(Zombie zombie: zombies) {
+			if(player.getAttackHitbox().overlaps(zombie.enemyHitbox) && !zombie.destroyed) {
+				zombie.destroy();
+				state.score += 10;
+			}
+			if (player.getPlayerHitbox().overlaps(zombie.enemyHitbox)) {
+				if (TimeUtils.millis() - lastPlayerDamage > 500) {
+					lastPlayerDamage = TimeUtils.millis();
+					if(state.getPlayerLife() -1 == 0) {
+						player.setDying(true);
+					}
+					state.setPlayerLife(state.getPlayerLife() -1);
+					
+				}
+			}
+			if(!zombie.destroyed) {
+				zombie.move(delta);
+				zombie.draw(batch);
+			}
+			
+		}
+		
+		for(LittleBat littleBat: littleBats) {
+			if(player.getAttackHitbox().overlaps(littleBat.enemyHitbox) && !littleBat.destroyed) {
+				littleBat.destroy();
+				state.score += 10;
+			}
+			if (player.getPlayerHitbox().overlaps(littleBat.enemyHitbox)) {
+				if (TimeUtils.millis() - lastPlayerDamage > 500) {
+					lastPlayerDamage = TimeUtils.millis();
+					state.setPlayerLife(state.getPlayerLife() -1);
+				}
+			}
+			if(!littleBat.destroyed) {
+				littleBat.move(delta);
+				littleBat.draw(batch);
+			}
+		}
+		
 		topBar.draw(batch);
 		applyGravityAndCollisions(delta);
 		player.move(delta);
 		player.draw(batch);
 		batch.end();
-
-		System.out.println(player.getX());
-		System.out.println(player.getY());
 	}
 
 	private void applyGravityAndCollisions(float delta) {
@@ -143,6 +192,14 @@ public class PlayScreen implements Screen {
 			String tileId = tile.toString();
 			if(tileId == "GROUND" || tileId == "LITTLE_BRICK") {
 				player.setX(player.getX() - 300 * delta);
+			}
+		}
+		
+		tile = world.getTileTypeByCoordinate(1, (int) ((player.getX()/(32*0.8f)) + (0.8f)), (int) ((player.getY()/(32*0.8f)) + (2*0.8f)));
+		if(tile != null) {
+			String tileId = tile.toString();
+			if(tileId == "GROUND" || tileId == "LITTLE_BRICK") {
+				player.setX(player.getX() + 300 * delta);
 			}
 		}
 

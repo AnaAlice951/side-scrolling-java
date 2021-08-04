@@ -39,8 +39,8 @@ public class SuperiorInterface {
 		);
 		
 		batch.draw(
-			lifeBar[0],
-			 camera.position.x - GAME_WIDTH/2 + GAME_WIDTH * 0.13671875f,
+			lifeBar[state.getPlayerLife() -1 ],
+			camera.position.x - GAME_WIDTH/2 + GAME_WIDTH * 0.13671875f,
 			GAME_HEIGHT - GAME_WIDTH * 0.0859375f,
 			GAME_WIDTH * 0.15625f, GAME_WIDTH * 0.0234375f,
 			0, 0, 
@@ -62,7 +62,7 @@ public class SuperiorInterface {
 			(SpriteBatch) batch,
 			(int) ((camera.position.x - GAME_WIDTH/2) + GAME_WIDTH * 0.15625f),
 			(int) (GAME_HEIGHT - GAME_WIDTH * 0.01953125f),
-			"100000",
+			String.valueOf(state.score),
 			Color.WHITE
 		);
 		
@@ -70,7 +70,7 @@ public class SuperiorInterface {
 			(SpriteBatch) batch,
 			(int) ((camera.position.x - GAME_WIDTH/2) + GAME_WIDTH * 0.7265625f),
 			(int) (GAME_HEIGHT - GAME_WIDTH * 0.0234375f),
-			"200",
+			String.valueOf(state.heartsCollected),
 			Color.WHITE
 		);
 		
@@ -78,7 +78,7 @@ public class SuperiorInterface {
 			(SpriteBatch) batch,
 			(int) ((camera.position.x - GAME_WIDTH/2) + GAME_WIDTH * 0.73046875f),
 			(int) (GAME_HEIGHT - GAME_WIDTH * 0.0703125),
-			"10000",
+			String.valueOf(state.playerChances),
 			Color.WHITE
 		);
 	}

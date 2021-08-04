@@ -11,8 +11,10 @@ public class Player {
 	//PlAYER FRAMES
     private Animation<Texture> walkAnimation;
     private Animation <Texture> attackAnimation;
+    private Animation <Texture> deathAnimation;
     private Texture[] walkFrames = new Texture[5];
     private Texture[] attackFrames = new Texture[3];
+    private Texture[] deathFrames = new Texture[2];
 	private boolean flipped = false;
 	private float stateTime = 0f;
 	
@@ -24,9 +26,11 @@ public class Player {
 
 	private float x, y;
     private boolean attacking = false;
+    private boolean dying = false;
     private boolean movingRight = false;
     private boolean movingLeft = false;
     private boolean jumping = false;
+    public boolean invunerable = false;
     private float jumpingInitialPosition;
     private State gameState;
 
@@ -47,6 +51,10 @@ public class Player {
         for(int i = 0; i < 3; i++)
         	attackFrames[i] = new Texture(Gdx.files.internal("player/attack"+ (i + 1) + ".png"));
         attackAnimation = new Animation<Texture>(0.1f, attackFrames);
+        
+        for(int i = 0; i < 2; i++)
+        	deathFrames[i] = new Texture(Gdx.files.internal("player/death"+ (i + 1) + ".png"));
+        deathAnimation = new Animation<Texture>(5f, deathFrames);
     }
     
 	public void draw(SpriteBatch batch) {
@@ -104,7 +112,7 @@ public class Player {
 			} else {
 				setAttacking(false);
 			}
-		} else {
+		} else if(!dying){
 			batch.draw(
 				walkFrames[0],
 				x, y,
@@ -114,6 +122,30 @@ public class Player {
 				flipped, false
 			);
 		}
+		else if(!attackAnimation.isAnimationFinished(stateTime)){
+			Texture currentFrameDying = deathAnimation.getKeyFrame(stateTime, false);
+			if(deathAnimation.getKeyFrameIndex(stateTime) == 0 )
+			batch.draw(
+					currentFrameDying,
+					x, y,
+					64, 32,
+					0, 0,
+					currentFrameDying.getWidth(), currentFrameDying.getHeight(),
+					flipped, false
+				);
+			else {
+				batch.draw(
+					currentFrameDying,
+					x, y,
+					32, 64,
+					0, 0,
+					currentFrameDying.getWidth(), currentFrameDying.getHeight(),
+					flipped, false
+				);
+			} 
+		} else {
+			setDying(false);
+		  }
 	}
 	
 	public void move(float delta) {
@@ -219,4 +251,14 @@ public class Player {
 		if(jumping)
 			jumpingInitialPosition = y;
 	}
+
+	public boolean isDying() {
+		return dying;
+	}
+
+	public void setDying(boolean dying) {
+    	stateTime = 0;
+		this.dying = dying;
+	}
+	
 }
