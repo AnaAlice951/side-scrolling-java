@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.mygdx.game.world.TileType;
+import com.mygdx.game.elements.Boss;
 import com.mygdx.game.elements.BreakableObject;
 import com.mygdx.game.MyGame;
 import com.mygdx.game.elements.Player;
@@ -66,6 +67,7 @@ public class PlayScreen implements Screen {
 	};
 
 	private Player player;
+	private Boss boss;
 	private ArrayList <Zombie> zombies = new ArrayList<Zombie>();
 	private ArrayList <LittleBat> littleBats = new ArrayList<LittleBat>();
 
@@ -74,6 +76,7 @@ public class PlayScreen implements Screen {
 
 	private Music backgroundMusic;
 	private Music bossBattleMusic;
+	private Sound collectHeartSound;
 
 	public PlayScreen(SpriteBatch batch, MyGame game) {
 		this.batch = batch;
@@ -82,10 +85,12 @@ public class PlayScreen implements Screen {
 
 	@Override
 	public void show() {
-		state = new State(1);
+		state = new State(5);
 		player = new Player(state);
+		boss = new Boss();
 		world = new World(player, state);
 		world.loadMap("levelmap.tmx");
+		
 		
 		topBar = new SuperiorInterface(world.getGameState(), world.getCamera());
 		
@@ -172,6 +177,28 @@ public class PlayScreen implements Screen {
 				littleBat.move(delta);
 				littleBat.draw(batch);
 			}
+		}
+		
+		
+		if(player.getAttackHitbox().overlaps(boss.enemyHitbox) && !boss.destroyed) {
+			boss.destroy();
+			state.setScore(state.getScore() + 10);
+		}
+
+		if (player.getPlayerHitbox().overlaps(boss.enemyHitbox)) {
+			if (TimeUtils.millis() - lastPlayerDamage > 2000) {
+				lastPlayerDamage = TimeUtils.millis();
+				if(state.getPlayerLife() -1 == 0) {
+					player.setDying(true);
+				}
+
+				state.setPlayerLife(state.getPlayerLife() -1);
+			}
+		}
+
+		if(!boss.destroyed) {
+			boss.draw(batch);
+			boss.move(player, delta);
 		}
 		
 		topBar.draw(batch);

@@ -1,6 +1,7 @@
 package com.mygdx.game.elements;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -31,6 +32,7 @@ public class Player {
     private boolean jumping = false;
     private float jumpingInitialPosition;
     private State gameState;
+    private Sound whipSound;
 
     public Player(State state){
     	gameState = state;
@@ -51,6 +53,8 @@ public class Player {
         for(int i = 0; i < 2; i++)
         	deathFrames[i] = new Texture(Gdx.files.internal("player/death"+ (i + 1) + ".png"));
         deathAnimation = new Animation<Texture>(1f, deathFrames);
+        
+        whipSound = Gdx.audio.newSound(Gdx.files.internal("audio/whip.mp3"));
     }
     
 	public void draw(SpriteBatch batch) {
@@ -107,6 +111,7 @@ public class Player {
 						}
 					}
 				} else {
+			    	whipSound.play();
 					setAttacking(false);
 				}
 			} else {
