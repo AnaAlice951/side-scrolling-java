@@ -1,4 +1,4 @@
-package com.mygdx.game.graphic.screens;
+package com.mygdx.game.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -6,7 +6,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.mygdx.game.models.MyGame;
+import com.mygdx.game.MyGame;
 
 public class MainMenuScreen implements Screen {
 	private MyGame game;

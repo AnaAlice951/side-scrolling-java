@@ -1,29 +1,28 @@
-package com.mygdx.game.graphic.screens;
+package com.mygdx.game.screens;
 
 import java.util.ArrayList;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.TimeUtils;
-import com.mygdx.game.graphic.world.TileType;
-import com.mygdx.game.models.BreakableObject;
-import com.mygdx.game.models.MyGame;
-import com.mygdx.game.models.Player;
-import com.mygdx.game.models.State;
-import com.mygdx.game.models.Zombie;
-import com.mygdx.game.models.Drop;
-import com.mygdx.game.models.LittleBat;
-import com.mygdx.game.graphic.UI.SuperiorInterface;
-import com.mygdx.game.graphic.world.World;
+import com.mygdx.game.world.TileType;
+import com.mygdx.game.elements.BreakableObject;
+import com.mygdx.game.MyGame;
+import com.mygdx.game.elements.Player;
+import com.mygdx.game.State;
+import com.mygdx.game.elements.Zombie;
+import com.mygdx.game.elements.Drop;
+import com.mygdx.game.elements.LittleBat;
+import com.mygdx.game.components.SuperiorInterface;
+import com.mygdx.game.world.World;
 
 public class PlayScreen implements Screen {
 
@@ -31,6 +30,7 @@ public class PlayScreen implements Screen {
 	private World world;
 	private SuperiorInterface topBar;
 	private State state;
+	private MyGame game;
 	
 	private BreakableObject[] breakableObjects = {
 		new BreakableObject("firejar", 10, 1, new Drop("heart", 10, 1)),
@@ -68,25 +68,24 @@ public class PlayScreen implements Screen {
 	private Player player;
 	private ArrayList <Zombie> zombies = new ArrayList<Zombie>();
 	private ArrayList <LittleBat> littleBats = new ArrayList<LittleBat>();
+
+	private long lastPlayerDamage;
+	private long lastEnemySpawn;
+
 	private Music backgroundMusic;
 	private Music bossBattleMusic;
-	private Sound gameOverSound;
-	private Sound allClearSound;
-	private long lastPlayerDamage;
 
 	public PlayScreen(SpriteBatch batch, MyGame game) {
 		this.batch = batch;
+		this.game = game;
 	}
 
 	@Override
 	public void show() {
-		state = new State(2);
+		state = new State(1);
 		player = new Player(state);
 		world = new World(player, state);
 		world.loadMap("levelmap.tmx");
-		
-		zombies.add(new Zombie(state.getStage()));
-		littleBats.add(new LittleBat(state.getStage()));
 		
 		topBar = new SuperiorInterface(world.getGameState(), world.getCamera());
 		
@@ -95,9 +94,6 @@ public class PlayScreen implements Screen {
 		
 		bossBattleMusic = Gdx.audio.newMusic(Gdx.files.internal("audio/boss_battle.mp3"));
 		bossBattleMusic.setLooping(true);
-		
-		gameOverSound = Gdx.audio.newSound(Gdx.files.internal("audio/game_over.mp3"));
-		allClearSound = Gdx.audio.newSound(Gdx.files.internal("audio/all_clear.mp3"));
 		
 		backgroundMusic.play();
 	}
@@ -114,6 +110,9 @@ public class PlayScreen implements Screen {
 		world.render(delta);
 
 		batch.begin();
+
+		spawnEnemies(state.getStage());
+
 		for(BreakableObject obj: breakableObjects) {
 			if (player.getAttackHitbox().overlaps(obj.getBounds())) {
 				obj.breakObject();
@@ -121,28 +120,31 @@ public class PlayScreen implements Screen {
 
 			if (player.getPlayerHitbox().overlaps(obj.getDrop().getBounds()) && obj.getDrop().isDropped()) {
 				obj.getDrop().collectDrop();
-				state.heartsCollected++;
+				state.setHeartsCollected(state.getHeartsCollected() + 1);
 			}
 			
 			obj.draw(batch);
 		}
 		
 		for(Zombie zombie: zombies) {
-			if(player.getAttackHitbox().overlaps(zombie.enemyHitbox) && !zombie.destroyed) {
+			if(player.getAttackHitbox().overlaps(zombie.getEnemyHitbox()) && !zombie.isDestroyed()) {
 				zombie.destroy();
-				state.score += 10;
+				state.setScore(state.getScore() + 10);
 			}
-			if (player.getPlayerHitbox().overlaps(zombie.enemyHitbox)) {
-				if (TimeUtils.millis() - lastPlayerDamage > 500) {
+			if (player.getPlayerHitbox().overlaps(zombie.getEnemyHitbox())) {
+				if (TimeUtils.millis() - lastPlayerDamage > 2000) {
 					lastPlayerDamage = TimeUtils.millis();
+
 					if(state.getPlayerLife() -1 == 0) {
 						player.setDying(true);
 					}
 					state.setPlayerLife(state.getPlayerLife() -1);
-					
+
+					if(state.getPlayerChances() == 0)
+						game.setScreen(new GameOverScreen(batch, game));
 				}
 			}
-			if(!zombie.destroyed) {
+			if(!zombie.isDestroyed()) {
 				zombie.move(delta);
 				zombie.draw(batch);
 			}
@@ -152,14 +154,20 @@ public class PlayScreen implements Screen {
 		for(LittleBat littleBat: littleBats) {
 			if(player.getAttackHitbox().overlaps(littleBat.enemyHitbox) && !littleBat.destroyed) {
 				littleBat.destroy();
-				state.score += 10;
+				state.setScore(state.getScore() + 10);
 			}
+
 			if (player.getPlayerHitbox().overlaps(littleBat.enemyHitbox)) {
-				if (TimeUtils.millis() - lastPlayerDamage > 500) {
+				if (TimeUtils.millis() - lastPlayerDamage > 2000) {
 					lastPlayerDamage = TimeUtils.millis();
+					if(state.getPlayerLife() -1 == 0) {
+						player.setDying(true);
+					}
+
 					state.setPlayerLife(state.getPlayerLife() -1);
 				}
 			}
+
 			if(!littleBat.destroyed) {
 				littleBat.move(delta);
 				littleBat.draw(batch);
@@ -169,7 +177,20 @@ public class PlayScreen implements Screen {
 		topBar.draw(batch);
 		applyGravityAndCollisions(delta);
 		player.move(delta);
+
+		long timeElapsedFromHit = TimeUtils.millis() - lastPlayerDamage;
+		if(timeElapsedFromHit < 2000) {
+			if(timeElapsedFromHit > 200 && timeElapsedFromHit <= 400 ||
+			timeElapsedFromHit > 600 && timeElapsedFromHit <= 800 ||
+			timeElapsedFromHit > 1000 && timeElapsedFromHit <= 1200 ||
+			timeElapsedFromHit > 1400 && timeElapsedFromHit <= 1600 ||
+			timeElapsedFromHit > 1800 && timeElapsedFromHit < 2000)
+				batch.setColor(0, 0, 0, 0);
+		}
+
 		player.draw(batch);
+
+		batch.setColor(1, 1, 1, 1);
 		batch.end();
 	}
 
@@ -178,6 +199,7 @@ public class PlayScreen implements Screen {
 
 		if(tile != null) {
 			String tileId = tile.toString();
+
 			if(tileId != "GROUND" && tileId != "STAIR") {
 				player.setY(player.getY() - 500 * delta);
 			} else if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
@@ -190,19 +212,27 @@ public class PlayScreen implements Screen {
 		tile = world.getTileTypeByCoordinate(1, (int) ((player.getX()/(32*0.8f)) + (2*0.8f)), (int) ((player.getY()/(32*0.8f)) + (2*0.8f)));
 		if(tile != null) {
 			String tileId = tile.toString();
+
 			if(tileId == "GROUND" || tileId == "LITTLE_BRICK") {
 				player.setX(player.getX() - 300 * delta);
+			} else if (tileId == "VOID") {
+				state.setStage(state.getStage() + 1);
+
+				if(state.getStage() > 5) {
+					game.setScreen(new AllClearScreen(batch, game, state, world.getCamera()));
+				}
 			}
 		}
 		
 		tile = world.getTileTypeByCoordinate(1, (int) ((player.getX()/(32*0.8f)) + (0.8f)), (int) ((player.getY()/(32*0.8f)) + (2*0.8f)));
+
 		if(tile != null) {
 			String tileId = tile.toString();
+
 			if(tileId == "GROUND" || tileId == "LITTLE_BRICK") {
 				player.setX(player.getX() + 300 * delta);
 			}
 		}
-
 	}
 
 	private void handleInput() {
@@ -246,6 +276,18 @@ public class PlayScreen implements Screen {
 		}
 	}
 
+	public void spawnEnemies(int stage) {
+		if (TimeUtils.millis() - lastEnemySpawn > 2000) {
+			lastEnemySpawn = TimeUtils.millis();
+
+			if(stage == 2 || stage == 3)
+				zombies.add(new Zombie());
+
+			if(stage == 4)
+				littleBats.add(new LittleBat());
+		}
+	}
+
 	@Override
 	public void resize(int width, int height) {
 		world.getCamera().resizeViewport(width, height);
@@ -268,12 +310,20 @@ public class PlayScreen implements Screen {
 		world.dispose();
 		backgroundMusic.dispose();
 		bossBattleMusic.dispose();
-		gameOverSound.dispose();
-		allClearSound.dispose();
 		topBar.dispose();
+
 		for(BreakableObject obj: breakableObjects) {
 			obj.dispose();
+			obj.getDrop().dispose();
 		}
+
+		for(Zombie zombie: zombies)
+			zombie.getFrame().dispose();
+
+		for(LittleBat littleBat: littleBats)
+			for(Texture t: littleBat.getFrames())
+				t.dispose();
+
 		player.dispose();
 	}
 }

@@ -1,12 +1,12 @@
-package com.mygdx.game.graphic.UI;
+package com.mygdx.game.components;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.mygdx.game.graphic.world.Camera;
-import com.mygdx.game.models.State;
+import com.mygdx.game.world.Camera;
+import com.mygdx.game.State;
 
 public class SuperiorInterface {
 	private State state;
@@ -62,7 +62,7 @@ public class SuperiorInterface {
 			(SpriteBatch) batch,
 			(int) ((camera.position.x - GAME_WIDTH/2) + GAME_WIDTH * 0.15625f),
 			(int) (GAME_HEIGHT - GAME_WIDTH * 0.01953125f),
-			String.valueOf(state.score),
+			String.valueOf(state.getScore()),
 			Color.WHITE
 		);
 		
@@ -70,7 +70,7 @@ public class SuperiorInterface {
 			(SpriteBatch) batch,
 			(int) ((camera.position.x - GAME_WIDTH/2) + GAME_WIDTH * 0.7265625f),
 			(int) (GAME_HEIGHT - GAME_WIDTH * 0.0234375f),
-			String.valueOf(state.heartsCollected),
+			String.valueOf(state.getHeartsCollected()),
 			Color.WHITE
 		);
 		
@@ -78,7 +78,7 @@ public class SuperiorInterface {
 			(SpriteBatch) batch,
 			(int) ((camera.position.x - GAME_WIDTH/2) + GAME_WIDTH * 0.73046875f),
 			(int) (GAME_HEIGHT - GAME_WIDTH * 0.0703125),
-			String.valueOf(state.playerChances),
+			String.valueOf(state.getPlayerChances()),
 			Color.WHITE
 		);
 	}

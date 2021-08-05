@@ -1,4 +1,4 @@
-package com.mygdx.game.graphic.world;
+package com.mygdx.game.world;
 
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
@@ -6,8 +6,8 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.mygdx.game.models.Player;
-import com.mygdx.game.models.State;
+import com.mygdx.game.elements.Player;
+import com.mygdx.game.State;
 
 public class World {
 	

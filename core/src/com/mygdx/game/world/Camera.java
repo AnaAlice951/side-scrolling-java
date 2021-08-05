@@ -1,8 +1,9 @@
-package com.mygdx.game.graphic.world;
+package com.mygdx.game.world;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.mygdx.game.models.Player;
+import com.mygdx.game.Constants;
+import com.mygdx.game.elements.Player;
 
 public class Camera extends OrthographicCamera {
 	
@@ -12,7 +13,6 @@ public class Camera extends OrthographicCamera {
 	private float leftLimit;
 	private float rightLimit;
 
-	private float GAME_UNIT = 32 * 0.8f;
 	private float TILES_PER_DEVICE_WIDTH = Gdx.graphics.getWidth() / (32 * 0.8f);
 
 	public Camera() {
@@ -31,12 +31,12 @@ public class Camera extends OrthographicCamera {
 	}
 	
 	public void verifyOverflow(int stage) {
-		leftLimit = (Gdx.graphics.getWidth()/2) + (GAME_UNIT * 50 * (stage - 1));
-		rightLimit = leftLimit + (GAME_UNIT * (50 - TILES_PER_DEVICE_WIDTH));
+		leftLimit = (Gdx.graphics.getWidth()/2) + (Constants.GAME_UNIT * 50 * (stage - 1));
+		rightLimit = leftLimit + (Constants.GAME_UNIT * (50 - TILES_PER_DEVICE_WIDTH));
 
 		if(stage == 2 || stage == 3 ) {
-			leftLimit = (Gdx.graphics.getWidth()/2) + (GAME_UNIT * 50);
-			rightLimit = leftLimit + (GAME_UNIT * (100 - TILES_PER_DEVICE_WIDTH));
+			leftLimit = (Gdx.graphics.getWidth()/2) + (Constants.GAME_UNIT * 50);
+			rightLimit = leftLimit + (Constants.GAME_UNIT * (100 - TILES_PER_DEVICE_WIDTH));
 		}
 
 		if(position.x <= leftLimit)
