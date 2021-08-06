@@ -72,11 +72,11 @@ public class PlayScreen implements Screen {
 	private ArrayList <LittleBat> littleBats = new ArrayList<LittleBat>();
 
 	private long lastPlayerDamage;
+	private long lastBossHit;
 	private long lastEnemySpawn;
 
 	private Music backgroundMusic;
 	private Music bossBattleMusic;
-	private Sound collectHeartSound;
 
 	public PlayScreen(SpriteBatch batch, MyGame game) {
 		this.batch = batch;
@@ -85,7 +85,7 @@ public class PlayScreen implements Screen {
 
 	@Override
 	public void show() {
-		state = new State(5);
+		state = new State(1);
 		player = new Player(state);
 		boss = new Boss();
 		world = new World(player, state);
@@ -143,10 +143,8 @@ public class PlayScreen implements Screen {
 					if(state.getPlayerLife() -1 == 0) {
 						player.setDying(true);
 					}
-					state.setPlayerLife(state.getPlayerLife() -1);
 
-					if(state.getPlayerChances() == 0)
-						game.setScreen(new GameOverScreen(batch, game));
+					state.setPlayerLife(state.getPlayerLife() -1);
 				}
 			}
 			if(!zombie.isDestroyed()) {
@@ -181,8 +179,15 @@ public class PlayScreen implements Screen {
 		
 		
 		if(player.getAttackHitbox().overlaps(boss.enemyHitbox) && !boss.destroyed) {
-			boss.destroy();
-			state.setScore(state.getScore() + 10);
+			if (TimeUtils.millis() - lastBossHit > 500) {
+				lastBossHit = TimeUtils.millis();
+				state.setBossLife(state.getBossLife() - 1);
+
+				if (state.getBossLife() == 0) {
+					boss.destroy();
+					state.setScore(state.getScore() + 1000);
+				}
+			}
 		}
 
 		if (player.getPlayerHitbox().overlaps(boss.enemyHitbox)) {
@@ -196,7 +201,11 @@ public class PlayScreen implements Screen {
 			}
 		}
 
-		if(!boss.destroyed) {
+		if(state.getPlayerChances() == 0) {
+			game.setScreen(new GameOverScreen(batch, game, world.getCamera()));
+		}
+
+		if(!boss.destroyed && state.getStage() == 5) {
 			boss.draw(batch);
 			boss.move(player, delta);
 		}
@@ -245,6 +254,11 @@ public class PlayScreen implements Screen {
 			} else if (tileId == "VOID") {
 				state.setStage(state.getStage() + 1);
 
+				if(state.getStage() == 5){
+					backgroundMusic.stop();
+					bossBattleMusic.play();
+				}
+
 				if(state.getStage() > 5) {
 					game.setScreen(new AllClearScreen(batch, game, state, world.getCamera()));
 				}
@@ -263,7 +277,7 @@ public class PlayScreen implements Screen {
 	}
 
 	private void handleInput() {
-		if(Gdx.input.justTouched()) {
+		/*if(Gdx.input.justTouched()) {
 			Vector3 touchPoint = new Vector3();
 
 			for(BreakableObject obj: breakableObjects) {
@@ -272,7 +286,7 @@ public class PlayScreen implements Screen {
 				player.setX(touchPoint.x);
 				player.setY(touchPoint.y);
 			}
-		}
+		}*/
 
 		if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
 			if(!player.isAttacking()) {
@@ -351,6 +365,10 @@ public class PlayScreen implements Screen {
 			for(Texture t: littleBat.getFrames())
 				t.dispose();
 
+		for(Texture t: boss.getFrames())
+			t.dispose();
+
+		state.dispose();
 		player.dispose();
 	}
 }

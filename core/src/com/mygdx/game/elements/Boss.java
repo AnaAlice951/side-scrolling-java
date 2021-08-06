@@ -59,8 +59,6 @@ public class Boss{
 		enemyHitbox = new Rectangle (0,0,0,0);
 	}
 
-	
-
 	public Texture[] getFrames() {
 		return frames;
 	}

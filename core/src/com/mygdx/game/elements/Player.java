@@ -32,13 +32,14 @@ public class Player {
     private boolean jumping = false;
     private float jumpingInitialPosition;
     private State gameState;
+
     private Sound whipSound;
 
     public Player(State state){
     	gameState = state;
-        playerHitbox = new Rectangle(Constants.GAME_UNIT, 300, Constants.PLAYER_WIDTH,Constants.PLAYER_HEIGHT);
+        playerHitbox = new Rectangle(Constants.GAME_UNIT, 500, Constants.PLAYER_WIDTH,Constants.PLAYER_HEIGHT);
         x = Constants.GAME_UNIT;
-        y = 300;
+        y = 500;
 
         attackHitbox = new Rectangle(0, 0, 0, 0);
 

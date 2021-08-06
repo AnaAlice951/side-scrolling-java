@@ -13,7 +13,7 @@ public class SuperiorInterface {
 	private Camera camera;
 	private Texture superiorBar = new Texture(Gdx.files.internal("superior.png"));
 	private Texture[] lifeBar = new Texture[10];
-	private TextComponent text = new TextComponent(25);
+	private TextComponent text = new TextComponent(22);
 
 	private int GAME_WIDTH = Gdx.graphics.getWidth();
 	private int GAME_HEIGHT = Gdx.graphics.getHeight();
@@ -37,9 +37,9 @@ public class SuperiorInterface {
 			1280, 125,
 			false, false
 		);
-		
+
 		batch.draw(
-			lifeBar[state.getPlayerLife() -1 ],
+			lifeBar[state.getPlayerLife() - 1],
 			camera.position.x - GAME_WIDTH/2 + GAME_WIDTH * 0.13671875f,
 			GAME_HEIGHT - GAME_WIDTH * 0.0859375f,
 			GAME_WIDTH * 0.15625f, GAME_WIDTH * 0.0234375f,
@@ -47,9 +47,10 @@ public class SuperiorInterface {
 			200, 30, 
 			false, false
 		);
-		
+
+		if(state.getBossLife() > 0)
 		batch.draw(
-			lifeBar[0],
+			lifeBar[state.getBossLife() - 1],
 			(int) camera.position.x - GAME_WIDTH/2 + GAME_WIDTH * 0.421875f,
 			GAME_HEIGHT - GAME_WIDTH * 0.0859375f,
 			GAME_WIDTH * 0.15625f, GAME_WIDTH * 0.0234375f,

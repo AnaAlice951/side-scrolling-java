@@ -41,8 +41,7 @@ public class MainMenuScreen implements Screen {
 		batch.begin();
 		batch.draw(
 			currentFrame, 
-			0, 
-			0, 
+			0, 0,
 			Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), 
 			0, 0, 
 			600, 338, 
@@ -51,7 +50,7 @@ public class MainMenuScreen implements Screen {
 		batch.end();
 		
 		if(Gdx.input.isKeyJustPressed(Keys.ENTER)) {
-			game.setScreen(new PlayScreen(batch, game));
+			game.setScreen(new HowToPlayScreen(batch, game));
 		}
 	}
 

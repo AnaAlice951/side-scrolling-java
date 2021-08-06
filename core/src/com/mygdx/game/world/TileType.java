@@ -14,50 +14,20 @@ public enum TileType {
 	VOID(9, true, false, "Void"),
 	WINDOW(10, false, false, "Window"),
 	JAR(11, false, true, "Jar");
-	
+
 	private int id;
 	private boolean collidable;
 	private boolean breakable;
 	private String name;
-	
-	private TileType(int id, boolean collidable, boolean breakable, String name) {
+
+	TileType(int id, boolean collidable, boolean breakable, String name) {
 		this.id = id;
-		this.collidable = collidable;
-		this.breakable = breakable;
-		this.name = name;
 	}
 
 	public int getId() {
 		return id;
 	}
 
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public boolean isCollidable() {
-		return collidable;
-	}
-
-	public void setCollidable(boolean collidable) {
-		this.collidable = collidable;
-	}
-
-	public boolean isBreakable() {
-		return breakable;
-	}
-
-	public void setBreakable(boolean breakable) {
-		this.breakable = breakable;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
 	
 	private static HashMap<Integer, TileType> tileHashMap;
 	
