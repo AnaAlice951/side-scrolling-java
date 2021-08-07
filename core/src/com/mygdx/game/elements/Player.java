@@ -35,8 +35,10 @@ public class Player {
 
     private Sound whipSound;
 
-    public Player(State state){
-    	gameState = state;
+    private static Player instance;
+
+    private Player(){
+    	gameState = State.getInstance();
         playerHitbox = new Rectangle(Constants.GAME_UNIT, 500, Constants.PLAYER_WIDTH,Constants.PLAYER_HEIGHT);
         x = Constants.GAME_UNIT;
         y = 500;
@@ -57,6 +59,23 @@ public class Player {
         
         whipSound = Gdx.audio.newSound(Gdx.files.internal("audio/whip.mp3"));
     }
+
+	public static Player getInstance() {
+		if(instance == null) {
+			synchronized (Player.class) {
+				if(instance == null) {
+					instance = new Player();
+				}
+			}
+		}
+
+		return instance;
+	}
+
+	public Player resetInstance() {
+		instance = new Player();
+		return instance;
+	}
     
 	public void draw(SpriteBatch batch) {
 		attackHitbox = new Rectangle(0, 0, 0, 0);

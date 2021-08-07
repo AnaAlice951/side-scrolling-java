@@ -86,12 +86,12 @@ public class BreakableObject {
 	}
 	
 	public void breakObject() {
-		this.broken = true;
-		this.drop.setDropped(true);
-		this.bounds.height = 0;
-		this.bounds.width = 0;
-		this.bounds.x = 0;
-		this.bounds.y = 0;
+		broken = true;
+		drop.setDropped(true);
+		bounds.height = 0;
+		bounds.width = 0;
+		bounds.x = 0;
+		bounds.y = 0;
 	}
 	
 	public Rectangle getBounds() {

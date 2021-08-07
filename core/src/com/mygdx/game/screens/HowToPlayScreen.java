@@ -2,23 +2,19 @@ package com.mygdx.game.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.game.MyGame;
-import com.mygdx.game.world.Camera;
+import com.mygdx.game.Batcher;
 
 public class HowToPlayScreen implements Screen {
     private MyGame game;
     private Texture screen;
-    private SpriteBatch batch;
+    private Batcher batch;
 
-    public HowToPlayScreen(SpriteBatch batch, MyGame game) {
-        this.batch = batch;
+    public HowToPlayScreen(MyGame game) {
+        batch = Batcher.getInstance();
         this.game = game;
     }
 
@@ -44,7 +40,7 @@ public class HowToPlayScreen implements Screen {
         batch.end();
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.ENTER))
-            game.setScreen(new PlayScreen(batch, game));
+            game.setScreen(new PlayScreen(game));
     }
 
     @Override

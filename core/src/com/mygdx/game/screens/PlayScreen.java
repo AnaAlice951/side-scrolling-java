@@ -2,7 +2,6 @@ package com.mygdx.game.screens;
 
 import java.util.ArrayList;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -10,9 +9,9 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.mygdx.game.Batcher;
 import com.mygdx.game.world.TileType;
 import com.mygdx.game.elements.Boss;
 import com.mygdx.game.elements.BreakableObject;
@@ -27,7 +26,7 @@ import com.mygdx.game.world.World;
 
 public class PlayScreen implements Screen {
 
-	private SpriteBatch batch;
+	private Batcher batch;
 	private World world;
 	private SuperiorInterface topBar;
 	private State state;
@@ -77,29 +76,32 @@ public class PlayScreen implements Screen {
 
 	private Music backgroundMusic;
 	private Music bossBattleMusic;
+	private Sound damage;
 
-	public PlayScreen(SpriteBatch batch, MyGame game) {
-		this.batch = batch;
+	public PlayScreen(MyGame game) {
 		this.game = game;
 	}
 
 	@Override
 	public void show() {
-		state = new State(1);
-		player = new Player(state);
-		boss = new Boss();
-		world = new World(player, state);
+		batch = Batcher.getInstance().resetInstance();
+		state = State.getInstance().resetInstance();
+		player = Player.getInstance().resetInstance();
+		boss = Boss.getInstance().resetInstance();
+		world = World.getInstance().resetInstance();
 		world.loadMap("levelmap.tmx");
 		
 		
-		topBar = new SuperiorInterface(world.getGameState(), world.getCamera());
+		topBar = new SuperiorInterface();
 		
 		backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("audio/background.mp3"));
 		backgroundMusic.setLooping(true);
 		
 		bossBattleMusic = Gdx.audio.newMusic(Gdx.files.internal("audio/boss_battle.mp3"));
 		bossBattleMusic.setLooping(true);
-		
+
+		damage = Gdx.audio.newSound(Gdx.files.internal("audio/hit.mp3"));
+
 		backgroundMusic.play();
 	}
 
@@ -139,6 +141,7 @@ public class PlayScreen implements Screen {
 			if (player.getPlayerHitbox().overlaps(zombie.getEnemyHitbox())) {
 				if (TimeUtils.millis() - lastPlayerDamage > 2000) {
 					lastPlayerDamage = TimeUtils.millis();
+					damage.play();
 
 					if(state.getPlayerLife() -1 == 0) {
 						player.setDying(true);
@@ -151,7 +154,7 @@ public class PlayScreen implements Screen {
 				zombie.move(delta);
 				zombie.draw(batch);
 			}
-			
+
 		}
 		
 		for(LittleBat littleBat: littleBats) {
@@ -163,6 +166,8 @@ public class PlayScreen implements Screen {
 			if (player.getPlayerHitbox().overlaps(littleBat.enemyHitbox)) {
 				if (TimeUtils.millis() - lastPlayerDamage > 2000) {
 					lastPlayerDamage = TimeUtils.millis();
+					damage.play();
+
 					if(state.getPlayerLife() -1 == 0) {
 						player.setDying(true);
 					}
@@ -178,21 +183,24 @@ public class PlayScreen implements Screen {
 		}
 		
 		
-		if(player.getAttackHitbox().overlaps(boss.enemyHitbox) && !boss.destroyed) {
+		if(player.getAttackHitbox().overlaps(boss.getEnemyHitbox()) && !boss.destroyed) {
 			if (TimeUtils.millis() - lastBossHit > 500) {
 				lastBossHit = TimeUtils.millis();
 				state.setBossLife(state.getBossLife() - 1);
 
 				if (state.getBossLife() == 0) {
+					bossBattleMusic.stop();
 					boss.destroy();
 					state.setScore(state.getScore() + 1000);
 				}
 			}
 		}
 
-		if (player.getPlayerHitbox().overlaps(boss.enemyHitbox)) {
+		if (player.getPlayerHitbox().overlaps(boss.getEnemyHitbox())) {
 			if (TimeUtils.millis() - lastPlayerDamage > 2000) {
 				lastPlayerDamage = TimeUtils.millis();
+				damage.play();
+
 				if(state.getPlayerLife() -1 == 0) {
 					player.setDying(true);
 				}
@@ -202,7 +210,7 @@ public class PlayScreen implements Screen {
 		}
 
 		if(state.getPlayerChances() == 0) {
-			game.setScreen(new GameOverScreen(batch, game, world.getCamera()));
+			game.setScreen(new GameOverScreen(game));
 		}
 
 		if(!boss.destroyed && state.getStage() == 5) {
@@ -210,7 +218,7 @@ public class PlayScreen implements Screen {
 			boss.move(player, delta);
 		}
 		
-		topBar.draw(batch);
+		topBar.draw();
 		applyGravityAndCollisions(delta);
 		player.move(delta);
 
@@ -260,7 +268,7 @@ public class PlayScreen implements Screen {
 				}
 
 				if(state.getStage() > 5) {
-					game.setScreen(new AllClearScreen(batch, game, state, world.getCamera()));
+					game.setScreen(new AllClearScreen(game));
 				}
 			}
 		}
@@ -277,17 +285,6 @@ public class PlayScreen implements Screen {
 	}
 
 	private void handleInput() {
-		/*if(Gdx.input.justTouched()) {
-			Vector3 touchPoint = new Vector3();
-
-			for(BreakableObject obj: breakableObjects) {
-				world.getCamera().unproject(touchPoint.set(Gdx.input.getX(), Gdx.input.getY(), 0));
-
-				player.setX(touchPoint.x);
-				player.setY(touchPoint.y);
-			}
-		}*/
-
 		if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
 			if(!player.isAttacking()) {
 				world.getCamera().setMovingLeft(true);

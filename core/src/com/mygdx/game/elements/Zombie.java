@@ -62,7 +62,10 @@ public class Zombie{
 	
 	public void destroy() {
 		destroyed = true;
-		enemyHitbox = new Rectangle (0,0,0,0);
+		enemyHitbox.x = 0;
+		enemyHitbox.y = 0;
+		enemyHitbox.width = 0;
+		enemyHitbox.height = 0;
 	}
 
 	public void verifyOverflow() {

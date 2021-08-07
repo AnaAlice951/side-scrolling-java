@@ -3,14 +3,16 @@ package com.mygdx.game.components;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.mygdx.game.Batcher;
 import com.mygdx.game.world.Camera;
 import com.mygdx.game.State;
 
 public class SuperiorInterface {
 	private State state;
 	private Camera camera;
+
+	private Batcher batch;
 	private Texture superiorBar = new Texture(Gdx.files.internal("superior.png"));
 	private Texture[] lifeBar = new Texture[10];
 	private TextComponent text = new TextComponent(22);
@@ -18,16 +20,17 @@ public class SuperiorInterface {
 	private int GAME_WIDTH = Gdx.graphics.getWidth();
 	private int GAME_HEIGHT = Gdx.graphics.getHeight();
 
-	public SuperiorInterface(State state, Camera camera) {
-		this.state = state;
-		this.camera = camera;
+	public SuperiorInterface() {
+		state = State.getInstance();
+		camera = Camera.getInstance();
+		batch = Batcher.getInstance();
 		
 		for(int i = 0; i < 10; i++) {
 			lifeBar[i] = new Texture(Gdx.files.internal("lifebar/" + (i+1) + "life.png"));
 		}
 	}
 	
-	public void draw(Batch batch) {
+	public void draw() {
 		batch.draw(
 			superiorBar, 
 			(int) camera.position.x - GAME_WIDTH/2,

@@ -1,6 +1,7 @@
 package com.mygdx.game.elements;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -14,19 +15,41 @@ public class Boss{
 
     private int ENEMY_WIDTH = 95;
     private int ENEMY_HEIGHT = 55;
-	public Rectangle enemyHitbox;
+	private Rectangle enemyHitbox;
 
 	public boolean destroyed = false;
 	private float x = (225 * Constants.GAME_UNIT);
 	private float y = (15 * Constants.GAME_UNIT);
 
-	public Boss() {
+	private Sound killBoss;
+
+	private static Boss instance;
+
+	private Boss() {
 		for(int i = 0; i < 2; i++)
             frames[i] = new Texture(Gdx.files.internal("enemys/boss/bat"+ (i + 1) + ".png"));
         animation = new Animation<Texture>(0.2f, frames);
         enemyHitbox = new Rectangle (x, y,ENEMY_WIDTH ,ENEMY_HEIGHT);
+        killBoss = Gdx.audio.newSound(Gdx.files.internal("audio/kill_boss.mp3"));
 	}
-	
+
+	public static Boss getInstance() {
+		if(instance == null) {
+			synchronized (Boss.class) {
+				if(instance == null) {
+					instance = new Boss();
+				}
+			}
+		}
+
+		return instance;
+	}
+
+	public Boss resetInstance() {
+		instance = new Boss();
+		return instance;
+	}
+
 	public void draw (SpriteBatch batch) {
 		stateTime += Gdx.graphics.getDeltaTime();
 		Texture currentFrame = animation.getKeyFrame(stateTime, true);
@@ -55,11 +78,16 @@ public class Boss{
 	}
 
 	public void destroy() {
+		killBoss.play();
 		destroyed = true;
 		enemyHitbox = new Rectangle (0,0,0,0);
 	}
 
 	public Texture[] getFrames() {
 		return frames;
+	}
+
+	public Rectangle getEnemyHitbox() {
+		return enemyHitbox;
 	}
 }

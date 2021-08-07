@@ -5,8 +5,8 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.game.MyGame;
+import com.mygdx.game.Batcher;
 
 public class MainMenuScreen implements Screen {
 	private MyGame game;
@@ -15,12 +15,12 @@ public class MainMenuScreen implements Screen {
 	
 	private Texture[] loopAnimationFrames = new Texture[9];
 	
-	private SpriteBatch batch;
+	private Batcher batch;
 	
 	private float stateTime;
 	
-	public MainMenuScreen(SpriteBatch batch, MyGame game) {
-		this.batch = batch;
+	public MainMenuScreen(MyGame game) {
+		batch = Batcher.getInstance();
 		this.game = game;
 		stateTime = 0f;
 	}
@@ -50,7 +50,7 @@ public class MainMenuScreen implements Screen {
 		batch.end();
 		
 		if(Gdx.input.isKeyJustPressed(Keys.ENTER)) {
-			game.setScreen(new HowToPlayScreen(batch, game));
+			game.setScreen(new HowToPlayScreen(game));
 		}
 	}
 

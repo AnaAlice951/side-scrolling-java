@@ -12,12 +12,29 @@ public class State {
 	private Sound nextStageSound;
 	private Sound lifeLost;
 
+	private static State instance;
 
-	public State(int stage) {
+	private State(int stage) {
 		this.stage = stage;
-
 		nextStageSound = Gdx.audio.newSound(Gdx.files.internal("audio/next_stage.mp3"));
 		lifeLost = Gdx.audio.newSound(Gdx.files.internal("audio/life_lost.mp3"));
+	}
+
+	public static State getInstance() {
+		if(instance == null) {
+			synchronized (State.class) {
+				if(instance == null) {
+					instance = new State(1);
+				}
+			}
+		}
+
+		return instance;
+	}
+
+	public State resetInstance() {
+		instance = new State(1);
+		return instance;
 	}
 
 	public int getStage() {
@@ -37,7 +54,8 @@ public class State {
 		this.playerLife = playerLife;
 		if(playerLife <= 0) {
 			playerChances--;
-			lifeLost.play();
+			if(playerChances != 0)
+				lifeLost.play();
 			this.playerLife = 10;
 		}
 	}

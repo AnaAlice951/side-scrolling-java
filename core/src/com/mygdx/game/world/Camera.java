@@ -3,6 +3,7 @@ package com.mygdx.game.world;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.mygdx.game.Constants;
+import com.mygdx.game.State;
 import com.mygdx.game.elements.Player;
 
 public class Camera extends OrthographicCamera {
@@ -15,10 +16,29 @@ public class Camera extends OrthographicCamera {
 
 	private float TILES_PER_DEVICE_WIDTH = Gdx.graphics.getWidth() / (32 * 0.8f);
 
-	public Camera() {
+	private static Camera instance;
+
+	private Camera() {
 		setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 	}
-	
+
+	public static Camera getInstance() {
+		if(instance == null) {
+			synchronized (Camera.class) {
+				if(instance == null) {
+					instance = new Camera();
+				}
+			}
+		}
+
+		return instance;
+	}
+
+	public Camera resetInstance() {
+		instance = new Camera();
+		return instance;
+	}
+
 	public void resizeViewport(int vw, int vh) {
 		viewportWidth = vw;
 		viewportHeight = vh;

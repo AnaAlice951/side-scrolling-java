@@ -8,6 +8,7 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.mygdx.game.elements.Player;
 import com.mygdx.game.State;
+import com.mygdx.game.screens.PlayScreen;
 
 public class World {
 	
@@ -16,13 +17,32 @@ public class World {
 	private Camera camera;
 	private State gameState;
 	private Player player;
-	
-	public World(Player player, State state) {
-		camera = new Camera();
-		gameState = state;
-		this.player = player;
+
+	private static World instance;
+
+	public World() {
+		camera = Camera.getInstance();
+		gameState = State.getInstance();
+		player = Player.getInstance();
 	}
-	
+
+	public static World getInstance() {
+		if(instance == null) {
+			synchronized (World.class) {
+				if(instance == null) {
+					instance = new World();
+				}
+			}
+		}
+
+		return instance;
+	}
+
+	public World resetInstance() {
+		instance = new World();
+		return instance;
+	}
+
 	public void loadMap(String tmxFile) {
 		tiledMap = new TmxMapLoader().load(tmxFile);
 		renderer = new OrthogonalTiledMapRenderer(tiledMap, 0.8f);
@@ -56,9 +76,5 @@ public class World {
 
 	public Camera getCamera() {
 		return camera;
-	}
-
-	public State getGameState() {
-		return gameState;
 	}
 }
