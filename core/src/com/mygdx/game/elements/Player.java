@@ -232,7 +232,6 @@ public class Player {
 	public void verifyOverflow(int stage) {
     	float leftLimit = (Constants.GAME_UNIT * 50 * (stage - 1) - 20);
 		float rightLimit = leftLimit + (Constants.GAME_UNIT * 50 - (Constants.PLAYER_WIDTH - 10));
-		float bottomLimit = Constants.GAME_UNIT;
 
 		if(stage == 2 || stage == 3 ) {
 			leftLimit = (Constants.GAME_UNIT * 50) -20;
@@ -245,8 +244,8 @@ public class Player {
 		if(x >= rightLimit)
 			x = rightLimit;
 
-		if(y < bottomLimit)
-			y = bottomLimit;
+		if(y < 0)
+			y = 100;
 	}
 
     public boolean isMovingRight() {
