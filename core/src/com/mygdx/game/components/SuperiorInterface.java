@@ -8,6 +8,9 @@ import com.mygdx.game.Batcher;
 import com.mygdx.game.world.Camera;
 import com.mygdx.game.State;
 
+/**
+ * Classe responsável por renderizar e manipular informações referentes à barra superior do jogo
+ */
 public class SuperiorInterface {
 	private State state;
 	private Camera camera;
@@ -24,13 +27,19 @@ public class SuperiorInterface {
 		state = State.getInstance();
 		camera = Camera.getInstance();
 		batch = Batcher.getInstance();
-		
+
+		// define os frames das barras de vida
 		for(int i = 0; i < 10; i++) {
 			lifeBar[i] = new Texture(Gdx.files.internal("lifebar/" + (i+1) + "life.png"));
 		}
 	}
-	
+
+	/**
+	 * Renderiza a barra superior
+	 */
 	public void draw() {
+
+		// desenha o fundo da barra
 		batch.draw(
 			superiorBar, 
 			(int) camera.position.x - GAME_WIDTH/2,
@@ -41,6 +50,7 @@ public class SuperiorInterface {
 			false, false
 		);
 
+		// desenha a barra de vida do jogador
 		batch.draw(
 			lifeBar[state.getPlayerLife() - 1],
 			camera.position.x - GAME_WIDTH/2 + GAME_WIDTH * 0.13671875f,
@@ -51,6 +61,7 @@ public class SuperiorInterface {
 			false, false
 		);
 
+		// desenha a barra de vida do inimigo
 		if(state.getBossLife() > 0)
 		batch.draw(
 			lifeBar[state.getBossLife() - 1],
@@ -61,7 +72,8 @@ public class SuperiorInterface {
 			200, 30,
 			false, false
 		);
-		
+
+		// representa a pontuação do jogador
 		text.write(
 			(SpriteBatch) batch,
 			(int) ((camera.position.x - GAME_WIDTH/2) + GAME_WIDTH * 0.15625f),
@@ -69,7 +81,8 @@ public class SuperiorInterface {
 			String.valueOf(state.getScore()),
 			Color.WHITE
 		);
-		
+
+		// representa a quantidade de corações coletador pelo jogador
 		text.write(
 			(SpriteBatch) batch,
 			(int) ((camera.position.x - GAME_WIDTH/2) + GAME_WIDTH * 0.7265625f),
@@ -77,7 +90,8 @@ public class SuperiorInterface {
 			String.valueOf(state.getHeartsCollected()),
 			Color.WHITE
 		);
-		
+
+		// representa a quantidade de chances restantes ao jogador
 		text.write(
 			(SpriteBatch) batch,
 			(int) ((camera.position.x - GAME_WIDTH/2) + GAME_WIDTH * 0.73046875f),
@@ -86,7 +100,10 @@ public class SuperiorInterface {
 			Color.WHITE
 		);
 	}
-	
+
+	/**
+	 * Limpa os objetos inutilizados da memória
+	 */
 	public void dispose() {
 		superiorBar.dispose();
 		text.dispose();

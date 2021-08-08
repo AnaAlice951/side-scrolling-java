@@ -14,6 +14,9 @@ import com.mygdx.game.Batcher;
 import com.mygdx.game.components.TextComponent;
 import com.mygdx.game.world.Camera;
 
+/**
+ * Classe responsável por renderizar a tela de "fase concluída"
+ */
 public class AllClearScreen implements Screen {
     private MyGame game;
 
@@ -38,9 +41,12 @@ public class AllClearScreen implements Screen {
 
     @Override
     public void show() {
+        // define a tela de jogo completo
         screen = new Texture(Gdx.files.internal("all_clear_screen.png"));
-        allClearSound = Gdx.audio.newSound(Gdx.files.internal("audio/all_clear.mp3"));
         score = new TextComponent(40);
+
+        // toca o som de jogo completo
+        allClearSound = Gdx.audio.newSound(Gdx.files.internal("audio/all_clear.mp3"));
         allClearSound.play();
     }
 
@@ -49,6 +55,7 @@ public class AllClearScreen implements Screen {
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        // renderiza a tela de jogo completo
         batch.begin();
         batch.draw(
             screen,
@@ -59,6 +66,7 @@ public class AllClearScreen implements Screen {
             false, false
         );
 
+        // renderiza a pontuação final do jogador
         score.write(
             (SpriteBatch) batch,
             (int) (camera.position.x - 50),
@@ -69,6 +77,7 @@ public class AllClearScreen implements Screen {
 
         batch.end();
 
+        // verifica se o jogador deseja jogar novamente
         if(Gdx.input.isKeyJustPressed(Input.Keys.ENTER))
             game.setScreen(new PlayScreen(game));
     }

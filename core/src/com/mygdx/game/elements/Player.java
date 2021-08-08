@@ -37,29 +37,43 @@ public class Player {
 
     private static Player instance;
 
-    private Player(){
+	/**
+	 * Classe responsável pela renderização e manipulação de informações referentes ao personagem jogável
+	 */
+	private Player(){
     	gameState = State.getInstance();
-        playerHitbox = new Rectangle(Constants.GAME_UNIT, 500, Constants.PLAYER_WIDTH,Constants.PLAYER_HEIGHT);
+
+    	// define a posição e a hitbox de movimento e de ataque
+        playerHitbox = new Rectangle(Constants.GAME_UNIT, 32, Constants.PLAYER_WIDTH,Constants.PLAYER_HEIGHT);
         x = Constants.GAME_UNIT;
-        y = 500;
+        y = 32;
 
         attackHitbox = new Rectangle(0, 0, 0, 0);
 
+        // define os frames e a animação de movimento
         for(int i = 0; i < 5; i++)
             walkFrames[i] = new Texture(Gdx.files.internal("player/walk"+ (i + 1) + ".png"));
         walkAnimation = new Animation<Texture>(0.1f, walkFrames);
-    
+
+		// define os frames e a animação de ataque
         for(int i = 0; i < 3; i++)
         	attackFrames[i] = new Texture(Gdx.files.internal("player/attack"+ (i + 1) + ".png"));
         attackAnimation = new Animation<Texture>(0.1f, attackFrames);
-        
+
+		// define os frames e a animação de morte
         for(int i = 0; i < 2; i++)
         	deathFrames[i] = new Texture(Gdx.files.internal("player/death"+ (i + 1) + ".png"));
         deathAnimation = new Animation<Texture>(1f, deathFrames);
-        
+
+        // define o som de ataque (chicote)
         whipSound = Gdx.audio.newSound(Gdx.files.internal("audio/whip.mp3"));
     }
 
+	/**
+	 * Retorna uma instância única da classe (Singleton)
+	 *
+	 * @return instância única da classe
+	 */
 	public static Player getInstance() {
 		if(instance == null) {
 			synchronized (Player.class) {
@@ -72,15 +86,27 @@ public class Player {
 		return instance;
 	}
 
+	/**
+	 * Redefine a instância do jogador para o estado inicial
+	 *
+	 * @return instância redefinida
+	 */
 	public Player resetInstance() {
 		instance = new Player();
 		return instance;
 	}
-    
+
+	/**
+	 * Renderiza o jogador
+	 *
+	 * @param batch sprite batch
+	 */
 	public void draw(SpriteBatch batch) {
+		// remove o hitbox de ataque caso o comando de ataque não tenha sido realizado
 		attackHitbox = new Rectangle(0, 0, 0, 0);
 		stateTime += Gdx.graphics.getDeltaTime();
 
+		// verifica se o jogador está se movendo, atacando ou morrendo e renderiza as respectivas animações
 		if(!dying) {
 			if (!attacking && (movingLeft || movingRight)) {
 				Texture currentFrameWalking = walkAnimation.getKeyFrame(stateTime, true);
@@ -169,7 +195,12 @@ public class Player {
 			setDying(false);
 		}
 	}
-	
+
+	/**
+	 * Movimenta o jogador
+	 *
+	 * @param delta tempo percorrido
+	 */
 	public void move(float delta) {
     	if(!dying) {
 			if (isMovingRight()) {
@@ -193,9 +224,15 @@ public class Player {
 		playerHitbox.y = y;
     }
 
-    public void verifyOverflow(int stage) {
+	/**
+	 * Verifica se o jogador está dentro da área permitida
+	 *
+	 * @param stage fase do jogo
+	 */
+	public void verifyOverflow(int stage) {
     	float leftLimit = (Constants.GAME_UNIT * 50 * (stage - 1) - 20);
 		float rightLimit = leftLimit + (Constants.GAME_UNIT * 50 - (Constants.PLAYER_WIDTH - 10));
+		float bottomLimit = Constants.GAME_UNIT;
 
 		if(stage == 2 || stage == 3 ) {
 			leftLimit = (Constants.GAME_UNIT * 50) -20;
@@ -207,6 +244,9 @@ public class Player {
 
 		if(x >= rightLimit)
 			x = rightLimit;
+
+		if(y < bottomLimit)
+			y = bottomLimit;
 	}
 
     public boolean isMovingRight() {
@@ -224,13 +264,6 @@ public class Player {
 	public void setMovingLeft(boolean movingLeft) {
 		this.movingLeft = movingLeft;
 	}
-
-	public void dispose() {
-        for(Texture frame: walkFrames)
-            frame.dispose();
-        for(Texture frame: attackFrames)
-            frame.dispose();
-    }
 
 	public boolean isAttacking() {
 		return attacking;
@@ -279,5 +312,15 @@ public class Player {
 	public void setDying(boolean dying) {
 		stateTime = 0;
 		this.dying = dying;
+	}
+
+	/**
+	 * Limpa os objetos inutilizados da memória
+	 */
+	public void dispose() {
+		for(Texture frame: walkFrames)
+			frame.dispose();
+		for(Texture frame: attackFrames)
+			frame.dispose();
 	}
 }

@@ -24,6 +24,9 @@ import com.mygdx.game.elements.LittleBat;
 import com.mygdx.game.components.SuperiorInterface;
 import com.mygdx.game.world.World;
 
+/**
+ * Classe responsável por renderizar e manipular informações relacionadas à tela onde ocorre o jogo
+ */
 public class PlayScreen implements Screen {
 
 	private Batcher batch;
@@ -31,7 +34,8 @@ public class PlayScreen implements Screen {
 	private SuperiorInterface topBar;
 	private State state;
 	private MyGame game;
-	
+
+	// define todos os objetos quebrados e seus drops
 	private BreakableObject[] breakableObjects = {
 		new BreakableObject("firejar", 10, 1, new Drop("heart", 10, 1)),
 		new BreakableObject("firejar", 20, 1, new Drop("heart", 20, 1)),
@@ -89,11 +93,14 @@ public class PlayScreen implements Screen {
 		player = Player.getInstance().resetInstance();
 		boss = Boss.getInstance().resetInstance();
 		world = World.getInstance().resetInstance();
+
+		// carrega o tilemap no mundo
 		world.loadMap("levelmap.tmx");
 		
-		
+		// define uma nova barra superior de UI
 		topBar = new SuperiorInterface();
-		
+
+		// define os áudios de background default e luta final, além do som para quando o jogador recebe dano
 		backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("audio/background.mp3"));
 		backgroundMusic.setLooping(true);
 		
@@ -102,6 +109,7 @@ public class PlayScreen implements Screen {
 
 		damage = Gdx.audio.newSound(Gdx.files.internal("audio/hit.mp3"));
 
+		// toca o som background default
 		backgroundMusic.play();
 	}
 
@@ -112,14 +120,18 @@ public class PlayScreen implements Screen {
 		
 		batch.setProjectionMatrix(world.getCamera().combined);
 
+		// verifica o input do usuário
 		handleInput();
 
-		world.render(delta);
+		// renderiza o mapa e atualiza câmera
+		world.render();
 
 		batch.begin();
 
+		// spawna inimigos de periodicamente
 		spawnEnemies(state.getStage());
 
+		// renderiza todos os objetos quebráveis e monitora seu estado
 		for(BreakableObject obj: breakableObjects) {
 			if (player.getAttackHitbox().overlaps(obj.getBounds())) {
 				obj.breakObject();
@@ -132,7 +144,8 @@ public class PlayScreen implements Screen {
 			
 			obj.draw(batch);
 		}
-		
+
+		// renderiza todos os zumbis e monitora seu estado
 		for(Zombie zombie: zombies) {
 			if(player.getAttackHitbox().overlaps(zombie.getEnemyHitbox()) && !zombie.isDestroyed()) {
 				zombie.destroy();
@@ -156,7 +169,8 @@ public class PlayScreen implements Screen {
 			}
 
 		}
-		
+
+		// renderiza todos os morcegos e monitora seu estado
 		for(LittleBat littleBat: littleBats) {
 			if(player.getAttackHitbox().overlaps(littleBat.enemyHitbox) && !littleBat.destroyed) {
 				littleBat.destroy();
@@ -181,8 +195,9 @@ public class PlayScreen implements Screen {
 				littleBat.draw(batch);
 			}
 		}
-		
-		
+
+
+		// renderiza op Boss e monitora seu estado
 		if(player.getAttackHitbox().overlaps(boss.getEnemyHitbox()) && !boss.destroyed) {
 			if (TimeUtils.millis() - lastBossHit > 500) {
 				lastBossHit = TimeUtils.millis();
@@ -209,19 +224,26 @@ public class PlayScreen implements Screen {
 			}
 		}
 
-		if(state.getPlayerChances() == 0) {
-			game.setScreen(new GameOverScreen(game));
-		}
-
 		if(!boss.destroyed && state.getStage() == 5) {
 			boss.draw(batch);
 			boss.move(player, delta);
 		}
-		
+
+		// monitora a quantidade de chances restantes para o jogador
+		if(state.getPlayerChances() == 0) {
+			game.setScreen(new GameOverScreen(game));
+		}
+
+		// renderiza a barra superior
 		topBar.draw();
+
+		// aplica a gravidade no jogador e verifica colisões com tiles
 		applyGravityAndCollisions(delta);
+
+		// move o jogador
 		player.move(delta);
 
+		// muda as cores do sprite batch para que o sprite do jogador "pisque" ao receber dano
 		long timeElapsedFromHit = TimeUtils.millis() - lastPlayerDamage;
 		if(timeElapsedFromHit < 2000) {
 			if(timeElapsedFromHit > 200 && timeElapsedFromHit <= 400 ||
@@ -232,18 +254,25 @@ public class PlayScreen implements Screen {
 				batch.setColor(0, 0, 0, 0);
 		}
 
+		// renderiza o jogador
 		player.draw(batch);
 
 		batch.setColor(1, 1, 1, 1);
 		batch.end();
 	}
 
+	/**
+	 * Aplica a gravidade ao jogador e detecta colisões com os tiles do mapa
+	 *
+	 * @param delta tempo decorrido
+	 */
 	private void applyGravityAndCollisions(float delta) {
 		TileType tile = world.getTileTypeByCoordinate(1, (int) (player.getX()/(32*0.8f)), (int) (player.getY()/(32*0.8f)));
 
 		if(tile != null) {
 			String tileId = tile.toString();
 
+			// verifica se o jogador está em solo ou no ar
 			if(tileId != "GROUND" && tileId != "STAIR") {
 				player.setY(player.getY() - 500 * delta);
 			} else if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
@@ -257,16 +286,23 @@ public class PlayScreen implements Screen {
 		if(tile != null) {
 			String tileId = tile.toString();
 
+			// verifica se o jogador está avançando horizontalmente para um bloco rígido na direita
 			if(tileId == "GROUND" || tileId == "LITTLE_BRICK") {
 				player.setX(player.getX() - 300 * delta);
+
+				// verifica se o jogador avançou para o próximo nível
 			} else if (tileId == "VOID") {
 				state.setStage(state.getStage() + 1);
 
+				// verifica se o jogador está no último nível
 				if(state.getStage() == 5){
+
+					// para a música de fundo default e passa a tocar a música da luta final
 					backgroundMusic.stop();
 					bossBattleMusic.play();
 				}
 
+				// verifica se o jogador completou as fases
 				if(state.getStage() > 5) {
 					game.setScreen(new AllClearScreen(game));
 				}
@@ -278,13 +314,18 @@ public class PlayScreen implements Screen {
 		if(tile != null) {
 			String tileId = tile.toString();
 
+			// verifica se o jogador está avançando horizontalmente para um bloco rígido na esquerda
 			if(tileId == "GROUND" || tileId == "LITTLE_BRICK") {
 				player.setX(player.getX() + 300 * delta);
 			}
 		}
 	}
 
+	/**
+	 * Recebe e gerencia os inputs do usuário
+	 */
 	private void handleInput() {
+		// verifica movimento para a esquerda
 		if(Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
 			if(!player.isAttacking()) {
 				world.getCamera().setMovingLeft(true);
@@ -295,6 +336,7 @@ public class PlayScreen implements Screen {
 			player.setMovingLeft(false);
 		}
 
+		// verifica movimento para a direita
 		if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
 			if(!player.isAttacking()) {
 				world.getCamera().setMovingRight(true);
@@ -305,6 +347,7 @@ public class PlayScreen implements Screen {
 			player.setMovingRight(false);
 		}
 
+		// verifica comando de ataque
 		if(Gdx.input.isKeyPressed(Input.Keys.X)) {
 			player.setAttacking(true);
 			world.getCamera().setMovingLeft(false);
@@ -314,6 +357,11 @@ public class PlayScreen implements Screen {
 		}
 	}
 
+	/**
+	 * Spawna inimigos no mapa periodicamente, em seu respectivo nível
+	 *
+	 * @param stage fase atual
+	 */
 	public void spawnEnemies(int stage) {
 		if (TimeUtils.millis() - lastEnemySpawn > 2000) {
 			lastEnemySpawn = TimeUtils.millis();

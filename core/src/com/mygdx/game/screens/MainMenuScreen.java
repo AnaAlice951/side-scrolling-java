@@ -8,6 +8,11 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.mygdx.game.MyGame;
 import com.mygdx.game.Batcher;
 
+/**
+ * Classe responsável por renderizar a tela de menu principal do jogo
+ *
+ * (imagens retiradas do jogo)
+ */
 public class MainMenuScreen implements Screen {
 	private MyGame game;
 	
@@ -27,16 +32,18 @@ public class MainMenuScreen implements Screen {
 
 	@Override
 	public void show() {
+		// define a animação da tela de menu (animação original do jogo)
 		for(int i = 0; i < 9; i++)
 			loopAnimationFrames[i] = new Texture(Gdx.files.internal("title-screen-frames/loop/Frame ("+ (i+1) +").jpg"));
-		
+
 		loopAnimation = new Animation<Texture>(0.05f, loopAnimationFrames);
 	}
 
 	@Override
 	public void render(float delta) {
 		stateTime += Gdx.graphics.getDeltaTime();
-		
+
+		// renderiza o menu principal do jogo
 		Texture currentFrame = loopAnimation.getKeyFrame(stateTime, true);
 		batch.begin();
 		batch.draw(
@@ -48,7 +55,8 @@ public class MainMenuScreen implements Screen {
 			false, false
 		);
 		batch.end();
-		
+
+		// verifica se o jogador está pronto para avançar
 		if(Gdx.input.isKeyJustPressed(Keys.ENTER)) {
 			game.setScreen(new HowToPlayScreen(game));
 		}

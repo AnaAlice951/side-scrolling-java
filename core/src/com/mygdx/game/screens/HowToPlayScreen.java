@@ -8,6 +8,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.mygdx.game.MyGame;
 import com.mygdx.game.Batcher;
 
+/**
+ * Classe responsável por renderizar a tela com o tutorial de controles
+ */
 public class HowToPlayScreen implements Screen {
     private MyGame game;
     private Texture screen;
@@ -20,6 +23,7 @@ public class HowToPlayScreen implements Screen {
 
     @Override
     public void show() {
+        // define a tela de tutorial
         screen = new Texture(Gdx.files.internal("how_to_play_screen.png"));
     }
 
@@ -28,6 +32,7 @@ public class HowToPlayScreen implements Screen {
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        // renderiza a tela de tutorial
         batch.begin();
         batch.draw(
             screen,
@@ -39,6 +44,7 @@ public class HowToPlayScreen implements Screen {
         );
         batch.end();
 
+        // verifica se o jogador está pronto para jogar
         if(Gdx.input.isKeyJustPressed(Input.Keys.ENTER))
             game.setScreen(new PlayScreen(game));
     }

@@ -10,6 +10,9 @@ import com.mygdx.game.MyGame;
 import com.mygdx.game.Batcher;
 import com.mygdx.game.world.Camera;
 
+/**
+ * Classe responsável por renderizar a tela de "game over"
+ */
 public class GameOverScreen implements Screen {
     private MyGame game;
     private Texture screen;
@@ -21,12 +24,17 @@ public class GameOverScreen implements Screen {
         batch = Batcher.getInstance();
         this.game = game;
         camera = Camera.getInstance();
+
+        // define o som de game over
         gameOverSound = Gdx.audio.newSound(Gdx.files.internal("audio/game_over.mp3"));
     }
 
     @Override
     public void show() {
+        // define a tela de game over
         screen = new Texture(Gdx.files.internal("game_over_screen.png"));
+
+        // toca o som de game over
         gameOverSound.play();
     }
 
@@ -35,6 +43,7 @@ public class GameOverScreen implements Screen {
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        // renderiza a tela de game over
         batch.begin();
         batch.draw(
                 screen,
@@ -46,6 +55,7 @@ public class GameOverScreen implements Screen {
         );
         batch.end();
 
+        // verifica se o jogador deseja jogar novamente
         if(Gdx.input.isKeyJustPressed(Input.Keys.ENTER))
             game.setScreen(new PlayScreen(game));
     }

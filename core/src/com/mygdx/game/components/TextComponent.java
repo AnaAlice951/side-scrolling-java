@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 
 /**
- * Classe responsável pela criação dos componentes de texto na tela
+ * Classe responsável pela renderização dos componentes de texto na tela
  * 
  * Referências:
  * 
@@ -36,21 +36,25 @@ public class TextComponent {
 		glyphLayout  = new GlyphLayout();
 
 	}
-	
-	public GlyphLayout getGlyphLayout() {
-		return glyphLayout;
-	}
 
-	public void setGlyphLayout(GlyphLayout glyphLayout) {
-		this.glyphLayout = glyphLayout;
-	}
-
+	/**
+	 * Renderiza um componente de texto na tela
+	 *
+	 * @param batch sprite batch
+	 * @param x posição no eixo x
+	 * @param y posição no eixo y
+	 * @param s conteúdo do texto
+	 * @param color cor da fonte
+	 */
 	public void write(SpriteBatch batch, int x, int y, String s, Color color) {
 		glyphLayout.setText(font, s);
 		font.setColor(color);
 		font.draw(batch, glyphLayout, x, y);
 	}
-	
+
+	/**
+	 * Limpa os objetos inutilizados da memória
+	 */
 	public void dispose() {
 		fontGenerator.dispose();
 		font.dispose();

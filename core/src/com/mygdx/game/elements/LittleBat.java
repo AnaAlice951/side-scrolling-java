@@ -7,6 +7,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.mygdx.game.Constants;
 
+/**
+ * Classe responsável pela renderização e manipulação dos morcegos
+ */
 public class LittleBat{
     private Texture[] frames = new Texture[4];
     private Animation <Texture> animation;
@@ -23,10 +26,13 @@ public class LittleBat{
 	private float y;
 
 	public LittleBat() {
+
+		// define os frames e a animação
 		for(int i = 0; i < 4; i++)
             frames[i] = new Texture(Gdx.files.internal("enemys/bat/fly"+ (i + 1) + ".png"));
         animation = new Animation<Texture>(0.2f, frames);
-    
+
+        // define qual será o lado de onde o inimigo partirá
 		side = (int) Math.round(Math.random());
 
 		if (side==0) {
@@ -38,12 +44,21 @@ public class LittleBat{
 			flipped = false;
 		}
 		y = Constants.GAME_UNIT * 10;
+
+		// define a hitbox
 		enemyHitbox = new Rectangle (x, y,ENEMY_WIDTH ,ENEMY_HEIGHT);
 	}
-	
+
+	/**
+	 * Renderiza o morcego
+	 *
+	 * @param batch sprite batch
+	 */
 	public void draw (SpriteBatch batch) {
 		stateTime += Gdx.graphics.getDeltaTime();
 		Texture currentFrame = animation.getKeyFrame(stateTime, true);
+
+		// desenha o morcego caso não tenha sido derrotado
 		if(!destroyed) {
 			batch.draw(
 				currentFrame,
@@ -55,7 +70,12 @@ public class LittleBat{
 			);
 		}
 	}
-	
+
+	/**
+	 * Movimenta o morcego
+	 *
+	 * @param delta tempo decorrido
+	 */
 	public void move(float delta) {
 		if (side == 0) {
 			x += 150 * delta;
@@ -78,18 +98,24 @@ public class LittleBat{
 		verifyOverflow();
 	}
 
-
+	/**
+	 * Deleta o morcego do jogo
+	 */
 	public void destroy() {
 		destroyed = true;
+
+		// deleta a hitbox
 		enemyHitbox.x = 0;
 		enemyHitbox.y = 0;
 		enemyHitbox.width = 0;
 		enemyHitbox.height = 0;
 	}
 
+	/**
+	 * Verifica se o morcego está dentro da área permitida
+	 */
 	public void verifyOverflow() {
 		float limit;
-
 		if(side == 0 ) {
 			limit = Constants.GAME_UNIT * 200 - ENEMY_WIDTH;
 			if(x > limit)

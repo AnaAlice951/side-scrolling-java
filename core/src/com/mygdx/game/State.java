@@ -3,11 +3,27 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 
+/**
+ * Classe responsável por manipular todo o estado do jogo e dos personagens
+ */
 public class State {
+	// fase atual
 	private int stage;
+
+	// vida do jogador na chance atual
 	private int playerLife = 10;
+
+	// vida do Boss final
 	private int bossLife = 10;
-	private int score = 0, heartsCollected = 0, playerChances = 3;
+
+	// pontuação total do jogador
+	private int score = 0;
+
+	// quantidade de corações coletados
+	private int heartsCollected = 0;
+
+	// quantidade total de chances restantes
+	private int playerChances = 3;
 
 	private Sound nextStageSound;
 	private Sound lifeLost;
@@ -16,10 +32,19 @@ public class State {
 
 	private State(int stage) {
 		this.stage = stage;
+
+		// define o som que toca ao passar de fase
 		nextStageSound = Gdx.audio.newSound(Gdx.files.internal("audio/next_stage.mp3"));
+
+		// define o som que toca ao perder uma chance
 		lifeLost = Gdx.audio.newSound(Gdx.files.internal("audio/life_lost.mp3"));
 	}
 
+	/**
+	 * Retorna uma instância única da classe (Singleton)
+	 *
+	 * @return instância única
+	 */
 	public static State getInstance() {
 		if(instance == null) {
 			synchronized (State.class) {
@@ -32,6 +57,11 @@ public class State {
 		return instance;
 	}
 
+	/**
+	 * Redefine a instância para o estado inicial
+	 *
+	 * @return instância redefinida
+	 */
 	public State resetInstance() {
 		instance = new State(1);
 		return instance;
@@ -42,6 +72,7 @@ public class State {
 	}
 
 	public void setStage(int stage) {
+		// toca o som de próxima fase
 		nextStageSound.play();
 		this.stage = stage;
 	}
@@ -52,9 +83,13 @@ public class State {
 
 	public void setPlayerLife(int playerLife) {
 		this.playerLife = playerLife;
+
+		// verifica se a vida do jogador chegou a zero e contabiliza as chances respectivamente
 		if(playerLife <= 0) {
 			playerChances--;
 			if(playerChances != 0)
+
+				// toca o som de chance perdida
 				lifeLost.play();
 			this.playerLife = 10;
 		}

@@ -7,6 +7,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.mygdx.game.Constants;
 
+/**
+ * Classe responsável pela renderização e manipulação de informações referentes aos drops
+ */
 public class Drop {
 	private String object;
 	private int x;
@@ -23,45 +26,52 @@ public class Drop {
 		this.object = object;
 		this.x = x;
 		this.y = y;
-		
-		if(this.object == "heart") {
-			width = 48 * 0.8f;
-			height = 48 * 0.8f;
 
-			dropTexture = new Texture(Gdx.files.internal("items/heart.png"));
+		// define o tamanho e a hitbox
+		width = 48 * 0.8f;
+		height = 48 * 0.8f;
+		bounds = new Rectangle(Constants.GAME_UNIT * x, Constants.GAME_UNIT * y, 32, 32);
 
-			bounds = new Rectangle(Constants.GAME_UNIT * x, Constants.GAME_UNIT * y, 32, 32);
-			
-			collectHeartSound = Gdx.audio.newSound(Gdx.files.internal("audio/collecting_heart.mp3"));
-		}
+		// define a textura do drop
+		dropTexture = new Texture(Gdx.files.internal("items/heart.png"));
+
+		// define o som de coletar o drop
+		collectHeartSound = Gdx.audio.newSound(Gdx.files.internal("audio/collecting_heart.mp3"));
 	}
-	
+
+	/**
+	 * Renderiza o drop
+	 * @param batch sprite batch
+	 */
 	public void draw(SpriteBatch batch) {
+
+		// renderiza o drop caso este não tenha sido coletado
 		if(!dropCollected) {
-			if(object == "heart") {
-				batch.draw(
-					dropTexture,
-					Constants.GAME_UNIT * x, Constants.GAME_UNIT * y,
-					width, height,
-					0, 0, 
-					dropTexture.getWidth(), dropTexture.getHeight(),
-					false, false
-				);
-			}
+			batch.draw(
+				dropTexture,
+				Constants.GAME_UNIT * x, Constants.GAME_UNIT * y,
+				width, height,
+				0, 0,
+				dropTexture.getWidth(), dropTexture.getHeight(),
+				false, false
+			);
 		}
 	}
 
+	/**
+	 * Deleta o drop do jogo e contabiliza
+	 */
 	public void collectDrop() {
 		this.dropCollected = true;
+
+		// deleta a hitbox
 		this.bounds.height = 0;
 		this.bounds.width = 0;
 		this.bounds.x = 0;
 		this.bounds.y = 0;
-		collectHeartSound.play();
-	}
 
-	public void dispose() {
-		this.dropTexture.dispose();
+		// toca o som de coletar drop
+		collectHeartSound.play();
 	}
 
 	public Rectangle getBounds() {
@@ -74,5 +84,9 @@ public class Drop {
 
 	public void setDropped(boolean dropped) {
 		this.dropped = dropped;
+	}
+
+	public void dispose() {
+		this.dropTexture.dispose();
 	}
 }

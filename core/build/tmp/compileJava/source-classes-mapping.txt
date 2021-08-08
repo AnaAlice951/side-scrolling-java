@@ -1,5 +1,5 @@
-com/mygdx/game/world/Camera.java
- com.mygdx.game.world.Camera
+com/mygdx/game/elements/Zombie.java
+ com.mygdx.game.elements.Zombie
 com/mygdx/game/components/TextComponent.java
  com.mygdx.game.components.TextComponent
 com/mygdx/game/world/TileType.java
@@ -20,21 +20,21 @@ com/mygdx/game/screens/MainMenuScreen.java
  com.mygdx.game.screens.MainMenuScreen
 com/mygdx/game/components/SuperiorInterface.java
  com.mygdx.game.components.SuperiorInterface
+com/mygdx/game/elements/LittleBat.java
+ com.mygdx.game.elements.LittleBat
+com/mygdx/game/screens/GameOverScreen.java
+ com.mygdx.game.screens.GameOverScreen
+com/mygdx/game/screens/HowToPlayScreen.java
+ com.mygdx.game.screens.HowToPlayScreen
+com/mygdx/game/screens/AllClearScreen.java
+ com.mygdx.game.screens.AllClearScreen
+com/mygdx/game/elements/Boss.java
+ com.mygdx.game.elements.Boss
+com/mygdx/game/screens/PlayScreen.java
+ com.mygdx.game.screens.PlayScreen
 com/mygdx/game/world/World.java
  com.mygdx.game.world.World
 com/mygdx/game/elements/Player.java
  com.mygdx.game.elements.Player
-com/mygdx/game/elements/LittleBat.java
- com.mygdx.game.elements.LittleBat
-com/mygdx/game/elements/Zombie.java
- com.mygdx.game.elements.Zombie
-com/mygdx/game/screens/GameOverScreen.java
- com.mygdx.game.screens.GameOverScreen
-com/mygdx/game/elements/Boss.java
- com.mygdx.game.elements.Boss
-com/mygdx/game/screens/AllClearScreen.java
- com.mygdx.game.screens.AllClearScreen
-com/mygdx/game/screens/HowToPlayScreen.java
- com.mygdx.game.screens.HowToPlayScreen
-com/mygdx/game/screens/PlayScreen.java
- com.mygdx.game.screens.PlayScreen
+com/mygdx/game/world/Camera.java
+ com.mygdx.game.world.Camera
